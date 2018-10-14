@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<ecore:EPackage name="react_todo_app_2017021113_Akasky70_react_todo_app_step_4_bdeffc07" nsPrefix="ecoreTest" nsURI="http://www.example.org/ecoreTest" xmi:version="2.0" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <eClassifiers name="App" xsi:type="ecore:EClass">
+    <eStructuralFeatures containment="true" eType="#//TodoList" name="renderTodoList" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="TodoList" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="titleProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="itemsProp" xsi:type="ecore:EAttribute"/>
+  </eClassifiers>
+</ecore:EPackage>
