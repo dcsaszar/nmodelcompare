@@ -33,4 +33,24 @@ public class Node
 	{
 		return _eObject.eContents().stream().mapToInt(o -> o.eClass().getName() == "EAttribute" ? 1 : 0).sum();
 	}
+
+	public int getNumberOfMethods()
+	{
+		return _eObject.eContents().stream().mapToInt(o -> o.eClass().getName() == "EOperation" ? 1 : 0).sum();
+	}
+
+	public int getNumberOfReferences()
+	{
+		return _eObject.eContents().stream().mapToInt(o -> o.eClass().getName() == "EReference" ? 1 : 0).sum();
+	}
+
+	public String getDescription()
+	{
+		return getName() + " " + getType() + " " + _flatModel.getName();
+	}
+
+	public boolean isInSameModel(Node otherNode)
+	{
+		return _flatModel == otherNode._flatModel;
+	}
 }

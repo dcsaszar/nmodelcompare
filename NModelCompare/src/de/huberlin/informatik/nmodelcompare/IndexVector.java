@@ -4,10 +4,10 @@ import com.savarese.spatial.GenericPoint;
 
 public class IndexVector extends GenericPoint<Double>
 {
-	public IndexVector()
+	public IndexVector(int dimensions)
 	{
-		super(VectorDimension.DIMENSIONS);
-		for (int d = 0; d < VectorDimension.DIMENSIONS; d++)
+		super(dimensions);
+		for (int d = 0; d < dimensions; d++)
 		{
 			this.setCoord(d, 0.0);
 		}
@@ -16,5 +16,10 @@ public class IndexVector extends GenericPoint<Double>
 	public void setCoord(VectorDimension d, int v)
 	{
 		setCoord(d.ordinal(), (double)v);
+	}
+
+	public void setCoord(int d, int v)
+	{
+		super.setCoord(d, (double)v);
 	}
 }

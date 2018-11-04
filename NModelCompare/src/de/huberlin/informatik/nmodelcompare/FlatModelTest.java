@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class FlatModelTest
 {
-	private static final String SIMPLE = "testdata/react_todo_app_2017021113_Akasky70_react_todo_app_step_4_bdeffc07.ecore";
+	private static final String SIMPLE = "testdata/special_cases_test.ecore";
 
 	@Test
 	void storesAllKnownNodes()
@@ -17,7 +17,7 @@ class FlatModelTest
 		EPackageImpl model = ModelLoader.loadEcore(SIMPLE);
 		FlatModel flatModel = new FlatModel(model);
 		List<Node> nodes = flatModel.getNodes();
-		assertEquals(5, nodes.size());
+		assertEquals(7, nodes.size());
 	}
 
 	@Test
@@ -28,9 +28,11 @@ class FlatModelTest
 		List<Node> nodes = flatModel.getNodes();
 		assertEquals("App", nodes.get(0).getName());
 		assertEquals("renderTodoList", nodes.get(1).getName());
-		assertEquals("TodoList", nodes.get(2).getName());
-		assertEquals("titleProp", nodes.get(3).getName());
-		assertEquals("itemsProp", nodes.get(4).getName());
+		assertEquals("sameAttrInTwoClasses", nodes.get(2).getName());
+		assertEquals("TodoList", nodes.get(3).getName());
+		assertEquals("sameAttrInTwoClasses", nodes.get(4).getName());
+		assertEquals("titleProp", nodes.get(5).getName());
+		assertEquals("itemsProp", nodes.get(6).getName());
 	}
 
 	@Test
@@ -41,8 +43,10 @@ class FlatModelTest
 		List<Node> nodes = flatModel.getNodes();
 		assertEquals("EClass", nodes.get(0).getType());
 		assertEquals("EReference", nodes.get(1).getType());
-		assertEquals("EClass", nodes.get(2).getType());
-		assertEquals("EAttribute", nodes.get(3).getType());
+		assertEquals("EAttribute", nodes.get(2).getType());
+		assertEquals("EClass", nodes.get(3).getType());
 		assertEquals("EAttribute", nodes.get(4).getType());
+		assertEquals("EAttribute", nodes.get(5).getType());
+		assertEquals("EAttribute", nodes.get(6).getType());
 	}
 }

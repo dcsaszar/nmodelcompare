@@ -2,22 +2,47 @@ package de.huberlin.informatik.nmodelcompare;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.stream.IntStream;
+
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 import org.junit.jupiter.api.Test;
 
 class IndexVectorTest
 {
 	private static final double E = 0.000000001;
-	private static final String SIMPLE = "testdata/react_todo_app_2017021113_Akasky70_react_todo_app_step_4_bdeffc07.ecore";
+	private static final EPackageImpl model = ModelLoader.loadEcore("testdata/full_sample.ecore");
 
 	@Test
 	void containsMetricalIndexes()
 	{
-		EPackageImpl model = ModelLoader.loadEcore(SIMPLE);
 		FlatModel flatModel = new FlatModel(model);
-		IndexVectorFactory indexVectorFactory = new IndexVectorFactory();
-		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(2));
-		assertEquals("TodoList".length(), indexVector.getCoord(VectorDimension.LON.ordinal()), E);
-		assertEquals(2, indexVector.getCoord(VectorDimension.NOA.ordinal()), E);
+		IndexVectorFactory indexVectorFactory = new IndexVectorFactory(flatModel.getNodes());
+		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
+		assertEquals("MyTestClass".length(), indexVector.getCoord(VectorDimension.LENGTH_OF_NAME.ordinal()), E);
+		assertEquals(3, indexVector.getCoord(VectorDimension.NUMBER_OF_ATTRIBUTES.ordinal()), E);
+		assertEquals(2, indexVector.getCoord(VectorDimension.NUMBER_OF_METHODS.ordinal()), E);
+		assertEquals(1, indexVector.getCoord(VectorDimension.NUMBER_OF_REFERENCES.ordinal()), E);
+	}
+
+	@Test
+	void containsLexicalIndexes()
+	{
+		FlatModel flatModel = new FlatModel(model);
+		IndexVectorFactory indexVectorFactory = new IndexVectorFactory(flatModel.getNodes());
+		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
+		int d = indexVector.getDimensions();
+
+		assertEquals(24, d - VectorDimension.DIMENSIONS);
+
+		double lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector.getCoord(i)).sum();
+		assertEquals(4, lexicalSum, E);
+
+		IndexVector indexVector1 = indexVectorFactory.vectorFor(flatModel.getNodes().get(1));
+		lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector1.getCoord(i)).sum();
+		assertEquals(3, lexicalSum, E);
+
+		IndexVector indexVector2 = indexVectorFactory.vectorFor(flatModel.getNodes().get(2));
+		lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector2.getCoord(i)).sum();
+		assertEquals(3, lexicalSum, E);
 	}
 }

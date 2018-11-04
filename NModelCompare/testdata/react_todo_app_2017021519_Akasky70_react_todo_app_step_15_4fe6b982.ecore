@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<ecore:EPackage name="react_todo_app_2017021519_Akasky70_react_todo_app_step_15_4fe6b982" nsPrefix="ecoreTest" nsURI="http://www.example.org/ecoreTest" xmi:version="2.0" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <eClassifiers name="ButtonWrapper" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="modeProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="changeModeProp" xsi:type="ecore:EAttribute"/>
+  </eClassifiers>
+  <eClassifiers name="CheckBox" xsi:type="ecore:EClass">
+    <eOperations name="handleChange"/>
+  </eClassifiers>
+  <eClassifiers name="Filter" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="filterProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="changeFilterProp" xsi:type="ecore:EAttribute"/>
+  </eClassifiers>
+  <eClassifiers name="FilteredList" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="itemsProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="changeStatusProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures containment="true" eType="#//TodoItem" name="renderTodoItem" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="Footer" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="countProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="filterProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="changeFilterProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures containment="true" eType="#//ButtonWrapper" name="renderButtonWrapper" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//Filter" name="renderFilter" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="Header" xsi:type="ecore:EClass">
+    <eStructuralFeatures containment="true" eType="#//InputWrapper" name="renderInputWrapper" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="Info" xsi:type="ecore:EClass"/>
+  <eClassifiers name="InputBox" xsi:type="ecore:EClass">
+    <eOperations name="handleChange"/>
+    <eOperations name="handleKeyUp"/>
+  </eClassifiers>
+  <eClassifiers name="InputWrapper" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="modeProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="addNewProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="queryProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="setSearchQueryProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures containment="true" eType="#//InputBox" name="renderInputBox" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//SearchBox" name="renderSearchBox" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="SearchBox" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="queryProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="setSearchQueryProp" xsi:type="ecore:EAttribute"/>
+  </eClassifiers>
+  <eClassifiers name="TodoItem" xsi:type="ecore:EClass">
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="dataProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EJavaObject" name="changeStatusProp" xsi:type="ecore:EAttribute"/>
+    <eStructuralFeatures containment="true" eType="#//CheckBox" name="renderCheckBox" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="TodoList" xsi:type="ecore:EClass">
+    <eStructuralFeatures containment="true" eType="#//Header" name="renderHeader" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//FilteredList" name="renderFilteredList" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//Footer" name="renderFooter" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//Info" name="renderInfo" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="App" xsi:type="ecore:EClass">
+    <eStructuralFeatures containment="true" eType="#//StateProvider" name="renderStateProvider" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//KeyStrokeHandler" name="renderKeyStrokeHandler" xsi:type="ecore:EReference"/>
+    <eStructuralFeatures containment="true" eType="#//TodoList" name="renderTodoList" xsi:type="ecore:EReference"/>
+  </eClassifiers>
+  <eClassifiers name="KeyStrokeHandler" xsi:type="ecore:EClass">
+    <eOperations name="handleKeyUp"/>
+  </eClassifiers>
+  <eClassifiers name="StateProvider" xsi:type="ecore:EClass">
+    <eOperations name="addNew"/>
+    <eOperations name="changeFilter"/>
+    <eOperations name="changeStatus"/>
+    <eOperations name="changeMode"/>
+    <eOperations name="setSearchQuery"/>
+  </eClassifiers>
+</ecore:EPackage>

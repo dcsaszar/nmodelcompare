@@ -8,22 +8,28 @@ import org.eclipse.emf.ecore.impl.EPackageImpl;
 public class FlatModel
 {
 	private List<Node> _nodes;
+	private EPackageImpl _model;
 
 	public FlatModel(EPackageImpl model)
 	{
 		_nodes = new ArrayList<>();
+		_model = model;
 		model.eAllContents().forEachRemaining(o -> {
-			switch (o.eClass().getName())
+			String className = o.eClass().getName();
+			switch (className)
 			{
 			case "EClass":
 			case "EReference":
 			case "EAttribute":
+			case "EOperation":
 				_nodes.add(new Node(this, o));
 				break;
+			case "EAnnotation":
 			case "EGenericType":
+			case "EStringToStringMapEntry":
 				break;
 			default:
-				throw new Error("unknown");
+				throw new Error("Unknown class " + className);
 			}
 		});
 	}
@@ -31,5 +37,10 @@ public class FlatModel
 	public List<Node> getNodes()
 	{
 		return _nodes;
+	}
+
+	public String getName()
+	{
+		return _model.getName();
 	}
 }
