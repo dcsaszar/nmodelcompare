@@ -63,7 +63,7 @@ class SimilaritiesTest
 				}
 			}
 		}
-		assertEquals(160, sum, 0.1);
-		assertEquals(328, nullCount);
+		assertEquals(81.5, sum, 0.1);
+		assertEquals(360, nullCount);
 	}
 }

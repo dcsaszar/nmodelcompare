@@ -25,6 +25,19 @@ class IndexVectorTest
 	}
 
 	@Test
+	void containsClassificationIndexes()
+	{
+		FlatModel flatModel = new FlatModel(model);
+		IndexVectorFactory indexVectorFactory = new IndexVectorFactory(flatModel.getNodes());
+		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
+		assertEquals("MyTestClass".length(), indexVector.getCoord(VectorDimension.LENGTH_OF_NAME.ordinal()), E);
+		assertEquals(1, indexVector.getCoord(VectorDimension.IS_CLASS.ordinal()), E);
+		assertEquals(0, indexVector.getCoord(VectorDimension.IS_ATTRIBUTE.ordinal()), E);
+		assertEquals(0, indexVector.getCoord(VectorDimension.IS_OPERATION.ordinal()), E);
+		assertEquals(0, indexVector.getCoord(VectorDimension.IS_REFERENCE.ordinal()), E);
+	}
+
+	@Test
 	void containsLexicalIndexes()
 	{
 		FlatModel flatModel = new FlatModel(model);
@@ -32,17 +45,17 @@ class IndexVectorTest
 		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
 		int d = indexVector.getDimensions();
 
-		assertEquals(24, d - VectorDimension.DIMENSIONS);
+		assertEquals(26, d - VectorDimension.DIMENSIONS);
 
 		double lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector.getCoord(i)).sum();
-		assertEquals(4, lexicalSum, E);
+		assertEquals(5, lexicalSum, E);
 
 		IndexVector indexVector1 = indexVectorFactory.vectorFor(flatModel.getNodes().get(1));
 		lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector1.getCoord(i)).sum();
-		assertEquals(3, lexicalSum, E);
+		assertEquals(4, lexicalSum, E);
 
 		IndexVector indexVector2 = indexVectorFactory.vectorFor(flatModel.getNodes().get(2));
 		lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector2.getCoord(i)).sum();
-		assertEquals(3, lexicalSum, E);
+		assertEquals(4, lexicalSum, E);
 	}
 }

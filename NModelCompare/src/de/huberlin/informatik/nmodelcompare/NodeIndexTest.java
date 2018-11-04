@@ -1,6 +1,8 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
@@ -31,6 +33,30 @@ class NodeIndexTest
 		assertEquals(20, nodes.size());
 		NodeIndex nodeIndex = new NodeIndex(nodes);
 		assertEquals(20, nodeIndex.getSize());
+	}
+
+	@Test
+	void distanceDependsOnParentName()
+	{
+		EPackageImpl model = ModelLoader.loadEcore("testdata/two_parents.ecore");
+		FlatModel flatModel = new FlatModel(model);
+		NodeIndex nodeIndex = new NodeIndex(flatModel.getNodes());
+		assertNotEquals(0d, nodeIndex.findAllByDistance(flatModel.getNodes().get(2)).get(1).getDistance());
+	}
+
+	@Test
+	void distanceDependsOnType()
+	{
+		EPackageImpl model = ModelLoader.loadEcore("testdata/two_parents.ecore");
+		FlatModel flatModel = new FlatModel(model);
+		NodeIndex nodeIndex = new NodeIndex(flatModel.getNodes());
+		double distanceForSameNameButDifferentType = nodeIndex.findAllByDistance(flatModel.getNodes().get(1)).get(1).getDistance();
+		double distanceForSameNameAndType = nodeIndex.findAllByDistance(flatModel.getNodes().get(2)).get(1).getDistance();
+
+		assertTrue(distanceForSameNameButDifferentType > distanceForSameNameAndType,
+				distanceForSameNameButDifferentType + ">" + distanceForSameNameAndType);
+		assertNotEquals(0d, distanceForSameNameButDifferentType);
+		assertNotEquals(0d, distanceForSameNameAndType);
 	}
 
 	@Test

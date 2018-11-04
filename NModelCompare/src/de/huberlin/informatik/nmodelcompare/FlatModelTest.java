@@ -49,4 +49,19 @@ class FlatModelTest
 		assertEquals("EAttribute", nodes.get(5).getType());
 		assertEquals("EAttribute", nodes.get(6).getType());
 	}
+
+	@Test
+	void storesNodeParentNames()
+	{
+		EPackageImpl model = ModelLoader.loadEcore(SIMPLE);
+		FlatModel flatModel = new FlatModel(model);
+		List<Node> nodes = flatModel.getNodes();
+		assertNull(nodes.get(0).getParentName());
+		assertEquals("App", nodes.get(1).getParentName());
+		assertEquals("App", nodes.get(2).getParentName());
+		assertNull(nodes.get(3).getParentName());
+		assertEquals("TodoList", nodes.get(4).getParentName());
+		assertEquals("TodoList", nodes.get(5).getParentName());
+		assertEquals("TodoList", nodes.get(6).getParentName());
+	}
 }

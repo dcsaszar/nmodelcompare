@@ -16,19 +16,24 @@ public class VisualizeSimilarityMatrix
 					"testdata/react_todo_app_2017021519_Akasky70_react_todo_app_step_15_4fe6b982.ecore",
 					"testdata/react_todo_app_2017062714_master_c9ef612a.ecore");
 		}
-		Similarities similarities = world.findSimilarities(7);
-		Matrix matrix = new DefaultDenseGenericMatrix2D<Integer>(similarities.get2DWidth(), similarities.get2DWidth());
+		Similarities similarities = world.findSimilarities(5);
+		Matrix matrix = new DefaultDenseGenericMatrix2D<>(similarities.get2DWidth(), similarities.get2DWidth());
+		matrix.setLabel("");
 		for (int i = 0; i < similarities.get2DWidth(); i++) {
 			Node nodeI = world.getNodes().get(i);
 			matrix.setRowLabel(i, nodeI.getDescription());
 			matrix.setColumnLabel(i, nodeI.getDescription());
 			for (int j = 0; j < similarities.get2DWidth(); j++) {
 				Node nodeJ = world.getNodes().get(j);
-				// matrix.setAsInt(0xff000000, i, j);
-				matrix.setAsString("N/A", i, j);
+				matrix.setAsString("", i, j);
 				if (similarities.getDistance(i, j) != null) {
 					Double d = similarities.getNormalizedDistance(i, j);
-					matrix.setAsDouble(d == 0 ? 0xffff00 : ((1 - d) * (nodeI.isInSameModel(nodeJ) ? -1 : 1)), i, j);
+					if (d == 0) {
+						matrix.setAsString(nodeI.getFullName(), i, j);
+					}
+					else {
+						matrix.setAsDouble(((1 - d) * (nodeI.isInSameModel(nodeJ) ? -1 : 1)), i, j);
+					}
 				}
 			}
 		}

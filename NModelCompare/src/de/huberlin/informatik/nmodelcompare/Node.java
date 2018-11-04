@@ -1,6 +1,7 @@
 package de.huberlin.informatik.nmodelcompare;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.ENamedElementImpl;
 
 public class Node
@@ -46,11 +47,23 @@ public class Node
 
 	public String getDescription()
 	{
-		return getName() + " " + getType() + " " + _flatModel.getName();
+		return getFullName() + " " + getType() + " " + _flatModel.getName();
+	}
+
+	public String getFullName()
+	{
+
+		return getParentName() == null ? getName() : (getParentName() + "." + getName());
 	}
 
 	public boolean isInSameModel(Node otherNode)
 	{
 		return _flatModel == otherNode._flatModel;
+	}
+
+	public String getParentName()
+	{
+		EObject eContainer = _eObject.eContainer();
+		return (eContainer instanceof EPackage) ? null : ((ENamedElementImpl)eContainer).getName();
 	}
 }
