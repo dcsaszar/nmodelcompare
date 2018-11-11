@@ -1,5 +1,8 @@
 package de.huberlin.informatik.nmodelcompare.visualization;
 
+import java.util.stream.Collectors;
+
+import org.javatuples.Pair;
 import org.ujmp.core.Matrix;
 import org.ujmp.core.genericmatrix.impl.DefaultDenseGenericMatrix2D;
 
@@ -16,18 +19,28 @@ public class VisualizeSimilarityMatrix
 					"testdata/react_todo_app_2017021519_Akasky70_react_todo_app_step_15_4fe6b982.ecore",
 					"testdata/react_todo_app_2017062714_master_c9ef612a.ecore");
 		}
-		Similarities similarities = world.findSimilarities(5);
-		Matrix matrix = new DefaultDenseGenericMatrix2D<>(similarities.get2DWidth(), similarities.get2DWidth());
+		Similarities allSimilarities = world.findSimilarities(5);
+		IdMatches idMatches = new IdMatches(allSimilarities);
+		String matchesDescription = idMatches.getMatches().stream()
+				.map(match -> match.stream().map(Node::getDescription).collect(Collectors.joining(" "))).collect(Collectors.joining("\n"));
+
+		Similarities similarities = idMatches.getRemaining();
+
+		Matrix matrix = new DefaultDenseGenericMatrix2D<>(allSimilarities.get2DWidth(), allSimilarities.get2DWidth());
+		matrix.setMetaData("matchesDescription", matchesDescription);
 		matrix.setLabel("");
-		for (int i = 0; i < similarities.get2DWidth(); i++) {
-			Node nodeI = world.getNodes().get(i);
+		for (int i = 0; i < allSimilarities.get2DWidth(); i++) {
+			Node nodeI = allSimilarities.getNodes().get(i);
 			matrix.setRowLabel(i, nodeI.getDescription());
 			matrix.setColumnLabel(i, nodeI.getDescription());
-			for (int j = 0; j < similarities.get2DWidth(); j++) {
-				Node nodeJ = world.getNodes().get(j);
+			for (int j = 0; j < allSimilarities.get2DWidth(); j++) {
+				Node nodeJ = allSimilarities.getNodes().get(j);
 				matrix.setAsString("", i, j);
-				if (similarities.getDistance(i, j) != null) {
-					Double d = similarities.getNormalizedDistance(i, j);
+				if (new Double(0).equals(allSimilarities.getDistance(new Pair<>(nodeI, nodeJ)))) {
+					matrix.setAsString(".", i, j);
+				}
+				if (similarities.getDistance(new Pair<>(nodeI, nodeJ)) != null) {
+					Double d = similarities.getNormalizedDistance(new Pair<>(nodeI, nodeJ));
 					if (d == 0) {
 						matrix.setAsString(nodeI.getFullName(), i, j);
 					}

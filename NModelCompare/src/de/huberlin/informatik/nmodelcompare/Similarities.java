@@ -1,27 +1,33 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import java.util.HashMap;
+import java.util.*;
 
 import org.javatuples.Pair;
 
 public class Similarities
 {
-	private HashMap<Pair<Integer, Integer>, Double> _matrix;
+	private HashMap<Pair<Node, Node>, Double> _matrix;
 	private int _width;
 	private Double _maxDistance;
+	private List<Node> _nodes;
 
-	public Similarities(int width)
+	public Similarities(List<Node> nodes)
 	{
 		_maxDistance = 0d;
-		_matrix = new HashMap<Pair<Integer, Integer>, Double>();
-		_width = width;
+		_matrix = new HashMap<Pair<Node, Node>, Double>();
+		_width = nodes.size();
+		_nodes = nodes;
 	}
 
-	public void addDistance(int nodeIndexX, int nodeIndexY, double distance)
+	public void addDistance(Node nodeA, Node nodeB, double distance)
+	{
+		addDistance(new Pair<>(nodeA, nodeB), distance);
+	}
+
+	public void addDistance(Pair<Node, Node> index, double distance)
 	{
 		_maxDistance = Math.max(distance, _maxDistance);
-		_matrix.put(new Pair<>(nodeIndexX, nodeIndexY), distance);
-		_matrix.put(new Pair<>(nodeIndexY, nodeIndexX), distance);
+		_matrix.put(index, distance);
 	}
 
 	public int get2DWidth()
@@ -29,14 +35,19 @@ public class Similarities
 		return _width;
 	}
 
-	public Double getDistance(int nodeIndexX, int nodeIndexY)
+	public Double getDistance(Pair<Node, Node> index)
 	{
-		return _matrix.get(new Pair<>(nodeIndexX, nodeIndexY));
+		return _matrix.get(index);
 	}
 
-	public Double getNormalizedDistance(int nodeIndexX, int nodeIndexY)
+	public Double getDistance(int nodeIndexX, int nodeIndexY)
 	{
-		Double d = getDistance(nodeIndexX, nodeIndexY);
+		return getDistance(new Pair<>(_nodes.get(nodeIndexX), _nodes.get(nodeIndexY)));
+	}
+
+	public Double getNormalizedDistance(Pair<Node, Node> index)
+	{
+		Double d = getDistance(index);
 		if (d == null) {
 			return null;
 		}
@@ -44,5 +55,25 @@ public class Similarities
 			return 1d;
 		}
 		return d / _maxDistance;
+	}
+
+	public Double getNormalizedDistance(int nodeIndexX, int nodeIndexY)
+	{
+		return getNormalizedDistance(new Pair<>(_nodes.get(nodeIndexX), _nodes.get(nodeIndexY)));
+	}
+
+	public Set<Pair<Node, Node>> getAllIndexes()
+	{
+		return _matrix.keySet();
+	}
+
+	public Pair<Node, Node> getNodePair(Pair<Integer, Integer> index)
+	{
+		return new Pair<>(_nodes.get(index.getValue0()), _nodes.get(index.getValue1()));
+	}
+
+	public List<Node> getNodes()
+	{
+		return _nodes;
 	}
 }

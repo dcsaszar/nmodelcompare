@@ -33,10 +33,8 @@ public class NModelWorld
 
 	private Similarities findSimilarities(double maxDistance, boolean includeForSameModel)
 	{
-		int width = _nodes.size();
-		Similarities similarities = new Similarities(width);
-		for (int i = 0; i < width; i++) {
-			Node node = getNodes().get(i);
+		Similarities similarities = new Similarities(getNodes());
+		for (Node node : getNodes()) {
 			List<QueryResult> similar = _nodeIndex.findNearby(node, maxDistance);
 			for (QueryResult result : similar) {
 				double distance = result.getDistance();
@@ -44,8 +42,8 @@ public class NModelWorld
 				if (!includeForSameModel && similarNode.isInSameModel(node)) {
 					continue;
 				}
-				int j = getNodes().indexOf(similarNode);
-				similarities.addDistance(i, j, distance);
+				similarities.addDistance(node, similarNode, distance);
+				similarities.addDistance(similarNode, node, distance);
 			}
 		}
 		return similarities;

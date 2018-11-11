@@ -9,9 +9,15 @@ public class FlatModel
 {
 	private List<Node> _nodes;
 	private EPackageImpl _model;
+	private Integer _id;
 
-	public FlatModel(EPackageImpl model)
+	public FlatModel(EPackageImpl model) {
+		this(model, null);
+	}
+
+	public FlatModel(EPackageImpl model, Integer id)
 	{
+		_id = id;
 		_nodes = new ArrayList<>();
 		_model = model;
 		model.eAllContents().forEachRemaining(o -> {
@@ -42,5 +48,10 @@ public class FlatModel
 	public String getName()
 	{
 		return _model.getName();
+	}
+
+	public Integer getId()
+	{
+		return _id;
 	}
 }

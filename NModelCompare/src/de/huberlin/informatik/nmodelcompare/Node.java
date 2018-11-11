@@ -47,12 +47,11 @@ public class Node
 
 	public String getDescription()
 	{
-		return getFullName() + " " + getType() + " " + _flatModel.getName();
+		return "M" + _flatModel.getId() + "." + getFullName() + getType().substring(1, 2);
 	}
 
 	public String getFullName()
 	{
-
 		return getParentName() == null ? getName() : (getParentName() + "." + getName());
 	}
 
