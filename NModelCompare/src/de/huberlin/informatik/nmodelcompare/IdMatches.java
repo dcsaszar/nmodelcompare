@@ -1,111 +1,25 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
 
 import org.javatuples.Pair;
 
-public class IdMatches
+public class IdMatches extends AbstractMatches
 {
-	private MatchesList _matchesList;
-	private Similarities _similarities;
-	private HashMap<Node, Set<Node>> _matchesByNode;
-	private Similarities _remainingSimilarities;
-
 	public IdMatches(Similarities similarities)
 	{
-		_similarities = similarities;
-		_matchesByNode = new HashMap<>();
-		similarities.getAllIndexes().stream().forEach(nodePair -> {
-			if (!isRuledOut(nodePair)) {
-				addMatch(nodePair);
-			}
-		});
-
-		Set<Pair<Node, Node>> keptPairs = _similarities.getAllIndexes().stream()
-				.filter(pair -> isIdWithoutMatch(pair) || (isDisjoint(pair) && isFittingMatch(pair)))
-				.collect(Collectors.toSet());
-		Set<Node> keptNodes = keptPairs.stream().flatMap(p -> Arrays.asList(new Node[] { p.getValue0(), p.getValue1() }).stream())
-				.collect(Collectors.toSet());
-
-		Similarities keptSimilarities = new Similarities(keptNodes.stream().collect(Collectors.toList()));
-		keptPairs.stream().forEach(pair -> keptSimilarities.addDistance(pair, _similarities.getDistance(pair)));
-		_remainingSimilarities = keptSimilarities;
-
-		Set<Set<Node>> uniqueMatches = _matchesByNode.values().stream().collect(Collectors.toSet());
-		_matchesList = new MatchesList(uniqueMatches);
+		super(similarities);
 	}
 
-	private boolean isDisjoint(Pair<Node, Node> nodePair)
+	@Override
+	Collection<Pair<Node, Node>> getPairsByPriority()
 	{
-		Node nodeA = nodePair.getValue0();
-		Node nodeB = nodePair.getValue1();
-
-		return !_matchesByNode.containsKey(nodeA) || (_matchesByNode.get(nodeA) != _matchesByNode.get(nodeB));
+		return getSimilarities().getAllIndexes();
 	}
 
-	private boolean isIdWithoutMatch(Pair<Node, Node> nodePair)
+	@Override
+	boolean isAcceptablePair(Pair<Node, Node> nodePair)
 	{
-		Node nodeA = nodePair.getValue0();
-		Node nodeB = nodePair.getValue1();
-		return nodeA == nodeB && _matchesByNode.get(nodeA).size() == 1;
-	}
-
-	private boolean isFittingMatch(Pair<Node, Node> nodePair)
-	{
-		Node nodeA = nodePair.getValue0();
-		Node nodeB = nodePair.getValue1();
-		if (nodeA.isInSameModel(nodeB)) {
-			return false;
-		}
-		Set<Node> group = new HashSet<Node>();
-		group.addAll(_matchesByNode.getOrDefault(nodeA, new HashSet<Node>()));
-		group.addAll(_matchesByNode.getOrDefault(nodeB, new HashSet<Node>()));
-		group.remove(nodeA);
-		group.remove(nodeB);
-		return !group.stream().anyMatch(node -> node.isInSameModel(nodeA) || node.isInSameModel(nodeB));
-	}
-
-	private void addMatch(Pair<Node, Node> nodePair)
-	{
-		Node nodeA = nodePair.getValue0();
-		Node nodeB = nodePair.getValue1();
-		_matchesByNode.putIfAbsent(nodeA, new HashSet<Node>());
-		_matchesByNode.putIfAbsent(nodeB, new HashSet<Node>());
-		_matchesByNode.get(nodeA).add(nodeA);
-		_matchesByNode.get(nodeA).add(nodeB);
-		_matchesByNode.get(nodeA).addAll(_matchesByNode.get(nodeB));
-		_matchesByNode.put(nodeB, _matchesByNode.get(nodeA));
-	}
-
-
-	private boolean isRuledOut(Pair<Node, Node> nodePair)
-	{
-		Node nodeA = nodePair.getValue0();
-		Node nodeB = nodePair.getValue1();
-		if (_similarities.getDistance(nodePair) != 0) {
-			return true;
-		}
-		if (nodeA == nodeB) {
-			return false;
-		}
-		if (nodeA.isInSameModel(nodeB)) {
-			return true;
-		}
-		return !isFittingMatch(nodePair);
-	}
-
-	public List<List<Node>> getMatches()
-	{
-		return _matchesList.getAll();
-	}
-	
-	public Similarities getRemaining() {
-		return _remainingSimilarities;
-	}
-
-	public MatchesList getMatchesList()
-	{
-		return _matchesList;
+		return getSimilarities().getDistance(nodePair) == 0;
 	}
 }
