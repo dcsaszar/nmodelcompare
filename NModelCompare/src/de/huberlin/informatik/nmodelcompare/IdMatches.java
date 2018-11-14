@@ -7,67 +7,105 @@ import org.javatuples.Pair;
 
 public class IdMatches
 {
-	private List<List<Node>> _matches;
+	private MatchesList _matchesList;
 	private Similarities _similarities;
 	private HashMap<Node, Set<Node>> _matchesByNode;
+	private Similarities _remainingSimilarities;
 
 	public IdMatches(Similarities similarities)
 	{
 		_similarities = similarities;
-		_matchesByNode = new HashMap<Node, Set<Node>>();
-		similarities.getAllIndexes().forEach(nodePair -> {
-			Node nodeA = nodePair.getValue0();
-			Node nodeB = nodePair.getValue1();
-			if (nodeA.isInSameModel(nodeB)) {
-				return;
+		_matchesByNode = new HashMap<>();
+		similarities.getAllIndexes().stream().forEach(nodePair -> {
+			if (!isRuledOut(nodePair)) {
+				addMatch(nodePair);
 			}
-			if (similarities.getDistance(nodePair) != 0) {
-				return;
-			}
-			_matchesByNode.putIfAbsent(nodeA, new HashSet<Node>());
-			_matchesByNode.putIfAbsent(nodeB, new HashSet<Node>());
-			_matchesByNode.get(nodeA).add(nodeA);
-			_matchesByNode.get(nodeA).add(nodeB);
-			_matchesByNode.get(nodeA).addAll(_matchesByNode.get(nodeB));
-			_matchesByNode.put(nodeB, _matchesByNode.get(nodeA));
 		});
-		Set<Set<Node>> matches = _matchesByNode.values().stream().collect(Collectors.toSet());
-		_matches = matches.stream().map(indexSet -> indexSet.stream().collect(Collectors.toList()))
-				.collect(Collectors.toList());
-	}
 
-	public List<List<Node>> getMatches()
-	{
-		return _matches;
-	}
-	
-	public Similarities getRemaining() {
-		Set<Pair<Node, Node>> keptPairs = _similarities.getAllIndexes().stream().filter(pair -> !this.isDismissableSimilarity(pair))
+		Set<Pair<Node, Node>> keptPairs = _similarities.getAllIndexes().stream()
+				.filter(pair -> isIdWithoutMatch(pair) || (isDisjoint(pair) && isFittingMatch(pair)))
 				.collect(Collectors.toSet());
 		Set<Node> keptNodes = keptPairs.stream().flatMap(p -> Arrays.asList(new Node[] { p.getValue0(), p.getValue1() }).stream())
 				.collect(Collectors.toSet());
 
 		Similarities keptSimilarities = new Similarities(keptNodes.stream().collect(Collectors.toList()));
 		keptPairs.stream().forEach(pair -> keptSimilarities.addDistance(pair, _similarities.getDistance(pair)));
-		return keptSimilarities;
+		_remainingSimilarities = keptSimilarities;
+
+		Set<Set<Node>> uniqueMatches = _matchesByNode.values().stream().collect(Collectors.toSet());
+		_matchesList = new MatchesList(uniqueMatches);
 	}
 
-	private boolean isDismissableSimilarity(Pair<Node, Node> pair)
+	private boolean isDisjoint(Pair<Node, Node> nodePair)
 	{
-		Node nodeA = pair.getValue0();
-		// dismiss, if nodeA is part of a match (i.e. it has already been matched)
-		if (_matchesByNode.containsKey(nodeA)) {
+		Node nodeA = nodePair.getValue0();
+		Node nodeB = nodePair.getValue1();
+
+		return !_matchesByNode.containsKey(nodeA) || (_matchesByNode.get(nodeA) != _matchesByNode.get(nodeB));
+	}
+
+	private boolean isIdWithoutMatch(Pair<Node, Node> nodePair)
+	{
+		Node nodeA = nodePair.getValue0();
+		Node nodeB = nodePair.getValue1();
+		return nodeA == nodeB && _matchesByNode.get(nodeA).size() == 1;
+	}
+
+	private boolean isFittingMatch(Pair<Node, Node> nodePair)
+	{
+		Node nodeA = nodePair.getValue0();
+		Node nodeB = nodePair.getValue1();
+		if (nodeA.isInSameModel(nodeB)) {
+			return false;
+		}
+		Set<Node> group = new HashSet<Node>();
+		group.addAll(_matchesByNode.getOrDefault(nodeA, new HashSet<Node>()));
+		group.addAll(_matchesByNode.getOrDefault(nodeB, new HashSet<Node>()));
+		group.remove(nodeA);
+		group.remove(nodeB);
+		return !group.stream().anyMatch(node -> node.isInSameModel(nodeA) || node.isInSameModel(nodeB));
+	}
+
+	private void addMatch(Pair<Node, Node> nodePair)
+	{
+		Node nodeA = nodePair.getValue0();
+		Node nodeB = nodePair.getValue1();
+		_matchesByNode.putIfAbsent(nodeA, new HashSet<Node>());
+		_matchesByNode.putIfAbsent(nodeB, new HashSet<Node>());
+		_matchesByNode.get(nodeA).add(nodeA);
+		_matchesByNode.get(nodeA).add(nodeB);
+		_matchesByNode.get(nodeA).addAll(_matchesByNode.get(nodeB));
+		_matchesByNode.put(nodeB, _matchesByNode.get(nodeA));
+	}
+
+
+	private boolean isRuledOut(Pair<Node, Node> nodePair)
+	{
+		Node nodeA = nodePair.getValue0();
+		Node nodeB = nodePair.getValue1();
+		if (_similarities.getDistance(nodePair) != 0) {
 			return true;
 		}
-		
-		Node nodeB = pair.getValue1();
-		// dismiss, if nodeB is part of a match, and nodeA belongs to any model of the
-		// match node set (i.e. another candidate from nodeA's model has already been
-		// chosen)
-		if (_matchesByNode.containsKey(nodeB)) {
-			return _matchesByNode.get(nodeB).stream().filter(node -> node.isInSameModel(nodeA)).findAny().isPresent();
+		if (nodeA == nodeB) {
+			return false;
 		}
+		if (nodeA.isInSameModel(nodeB)) {
+			return true;
+		}
+		return !isFittingMatch(nodePair);
+	}
 
-		return false;
+	public List<List<Node>> getMatches()
+	{
+		return _matchesList.getAll();
+	}
+	
+	public Similarities getRemaining() {
+		return _remainingSimilarities;
+	}
+
+	public MatchesList getMatchesList()
+	{
+		return _matchesList;
 	}
 }

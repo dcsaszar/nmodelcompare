@@ -1,7 +1,5 @@
 package de.huberlin.informatik.nmodelcompare.visualization;
 
-import java.util.stream.Collectors;
-
 import org.javatuples.Pair;
 import org.ujmp.core.Matrix;
 import org.ujmp.core.genericmatrix.impl.DefaultDenseGenericMatrix2D;
@@ -21,8 +19,7 @@ public class VisualizeSimilarityMatrix
 		}
 		Similarities allSimilarities = world.findSimilarities(5);
 		IdMatches idMatches = new IdMatches(allSimilarities);
-		String matchesDescription = idMatches.getMatches().stream()
-				.map(match -> match.stream().map(Node::getDescription).collect(Collectors.joining(" "))).collect(Collectors.joining("\n"));
+		String matchesDescription = idMatches.getMatchesList().getDescription();
 
 		Similarities similarities = idMatches.getRemaining();
 

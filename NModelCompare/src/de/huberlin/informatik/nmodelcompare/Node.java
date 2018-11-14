@@ -47,12 +47,17 @@ public class Node
 
 	public String getDescription()
 	{
-		return "M" + _flatModel.getId() + "." + getFullName() + getType().substring(1, 2);
+		return getFullNameTyped() + "-M" + _flatModel.getId();
 	}
 
 	public String getFullName()
 	{
 		return getParentName() == null ? getName() : (getParentName() + "." + getName());
+	}
+
+	public String getFullNameTyped()
+	{
+		return getFullName() + getType().substring(1, 2).replace("C", "");
 	}
 
 	public boolean isInSameModel(Node otherNode)
