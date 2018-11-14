@@ -89,7 +89,7 @@ class IdMatchesTest
 		Similarities similarities = world.findSimilarities(2.5);
 		Similarities remaining = new IdMatches(similarities).getRemaining();
 
-		assertEquals(63, remaining.get2DWidth()); // TODO unstable
-		assertEquals(136, remaining.getAllIndexes().size()); // TODO unstable
+		assertEquals(63, remaining.get2DWidth(), 4); // TODO unstable
+		assertEquals(136, remaining.getAllIndexes().size(), 4); // TODO unstable
 	}
 }

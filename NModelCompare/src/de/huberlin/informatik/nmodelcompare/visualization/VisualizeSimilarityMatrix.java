@@ -18,14 +18,25 @@ public class VisualizeSimilarityMatrix
 					"testdata/react_todo_app_2017062714_master_c9ef612a.ecore");
 		}
 		Similarities allSimilarities = world.findSimilarities(5);
-		IdMatches idMatches = new IdMatches(allSimilarities);
-		String matchesDescription = idMatches.getMatchesList().getDescription();
 
-		Similarities similarities = idMatches.getRemaining();
+		AbstractMatches idMatches = new IdMatches(allSimilarities);
+		AbstractMatches greedyDistanceMatches = new GreedyDistanceMatches(allSimilarities);
+
+		Matrix idMatrix = generateMatrix(allSimilarities, idMatches);
+		Matrix greedyDistanceMatrix = generateMatrix(allSimilarities, greedyDistanceMatches);
+		greedyDistanceMatrix.setMetaData("IdMatches", idMatrix);
+
+		greedyDistanceMatrix.showGUI();
+	}
+
+	private static Matrix generateMatrix(Similarities allSimilarities, AbstractMatches matches)
+	{
+		String matchesDescription = matches.getMatchesList().getDescription();
+
+		Similarities similarities = matches.getRemaining();
 
 		Matrix matrix = new DefaultDenseGenericMatrix2D<>(allSimilarities.get2DWidth(), allSimilarities.get2DWidth());
 		matrix.setMetaData("matchesDescription", matchesDescription);
-		matrix.setLabel("");
 		for (int i = 0; i < allSimilarities.get2DWidth(); i++) {
 			Node nodeI = allSimilarities.getNodes().get(i);
 			matrix.setRowLabel(i, nodeI.getDescription());
@@ -47,6 +58,6 @@ public class VisualizeSimilarityMatrix
 				}
 			}
 		}
-		matrix.showGUI();
+		return matrix;
 	}
 }

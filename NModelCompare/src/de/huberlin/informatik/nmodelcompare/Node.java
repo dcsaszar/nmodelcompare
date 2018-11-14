@@ -47,7 +47,12 @@ public class Node
 
 	public String getDescription()
 	{
-		return getFullNameTyped() + "-M" + _flatModel.getId();
+		return getFullNameTyped() + "-M" + getModelId();
+	}
+
+	public Integer getModelId()
+	{
+		return _flatModel.getId();
 	}
 
 	public String getFullName()

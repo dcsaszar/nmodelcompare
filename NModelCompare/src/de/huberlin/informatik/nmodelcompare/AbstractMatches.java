@@ -70,9 +70,10 @@ public abstract class AbstractMatches
 		Set<Node> group = new HashSet<Node>();
 		group.addAll(_matchesByNode.getOrDefault(nodeA, new HashSet<Node>()));
 		group.addAll(_matchesByNode.getOrDefault(nodeB, new HashSet<Node>()));
-		group.remove(nodeA);
-		group.remove(nodeB);
-		return !group.stream().anyMatch(node -> node.isInSameModel(nodeA) || node.isInSameModel(nodeB));
+		group.add(nodeA);
+		group.add(nodeB);
+		long modelCount = group.stream().map(Node::getModelId).distinct().count();
+		return group.size() == modelCount;
 	}
 
 	private void addMatch(Pair<Node, Node> nodePair)
