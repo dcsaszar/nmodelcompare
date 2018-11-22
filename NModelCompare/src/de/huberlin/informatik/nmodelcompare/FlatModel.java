@@ -3,19 +3,20 @@ package de.huberlin.informatik.nmodelcompare;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
 public class FlatModel
 {
 	private List<Node> _nodes;
-	private EPackageImpl _model;
+	private EPackage _model;
 	private Integer _id;
 
 	public FlatModel(EPackageImpl model) {
 		this(model, null);
 	}
 
-	public FlatModel(EPackageImpl model, Integer id)
+	public FlatModel(EPackage model, Integer id)
 	{
 		_id = id;
 		_nodes = new ArrayList<>();

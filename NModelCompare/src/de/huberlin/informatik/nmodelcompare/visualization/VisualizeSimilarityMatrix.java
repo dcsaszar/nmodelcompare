@@ -1,5 +1,7 @@
 package de.huberlin.informatik.nmodelcompare.visualization;
 
+import java.io.IOException;
+
 import org.javatuples.Pair;
 import org.ujmp.core.Matrix;
 import org.ujmp.core.genericmatrix.impl.DefaultDenseGenericMatrix2D;
@@ -8,14 +10,16 @@ import de.huberlin.informatik.nmodelcompare.*;
 
 public class VisualizeSimilarityMatrix
 {
-	public static void main(String... args)
+	public static void main(String... args) throws IOException
 	{
-		NModelWorld world = NModelWorldLoader.loadEcore(args);
+		NModelWorld world = NModelWorldLoader.load(args);
 		if (world.getNodes().size() == 0) {
 			System.out.println("Using fallback dataset.");
-			world = NModelWorldLoader.loadEcore("testdata/react_todo_app_2017021115_Akasky70_react_todo_app_step_10_c15f550b.ecore",
-					"testdata/react_todo_app_2017021519_Akasky70_react_todo_app_step_15_4fe6b982.ecore",
-					"testdata/react_todo_app_2017062714_master_c9ef612a.ecore");
+			world = NModelWorldLoader.load("testdata/hospitals.csv");
+			// world =
+			// NModelWorldLoader.loadEcore("testdata/react_todo_app_2017021115_Akasky70_react_todo_app_step_10_c15f550b.ecore",
+			// "testdata/react_todo_app_2017021519_Akasky70_react_todo_app_step_15_4fe6b982.ecore",
+			// "testdata/react_todo_app_2017062714_master_c9ef612a.ecore");
 		}
 		Similarities allSimilarities = world.findSimilarities(5);
 

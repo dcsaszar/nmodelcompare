@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="lib/libssrckdtree-j-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/javatuples-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/ujmp-complete-0.3.0.jar"/>
+	<classpathentry kind="lib" path="lib/commons-csv-1.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
