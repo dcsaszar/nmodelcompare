@@ -3,6 +3,7 @@ package de.huberlin.informatik.nmodelcompare;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MatchesList
 {
@@ -27,11 +28,13 @@ public class MatchesList
 
 	private String describe(List<Node> match)
 	{
-		String name0 = match.get(0).getFullNameTyped();
-		List<String> descriptions = match.stream()
-				.map(n -> n.getDescription().startsWith(name0) ? n.getDescription().replaceFirst(name0, "") : n.getDescription())
-				.collect(Collectors.toList());
-		descriptions.set(0, match.get(0).getDescription());
-		return String.join(",", descriptions);
+		return IntStream.range(0, match.size()).mapToObj(i -> {
+			String description = match.get(i).getDescription();
+			if (i == 0) {
+				return description;
+			}
+			String prev = match.get(i - 1).getFullNameTyped();
+			return description.startsWith(prev) ? description.replaceFirst(prev, "") : description;
+		}).collect(Collectors.joining(","));
 	}
 }
