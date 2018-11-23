@@ -1,8 +1,8 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,7 +33,8 @@ public class ModelLoader
 
 	public static List<EPackage> loadCsv(String path) throws IOException
 	{
-		CSVParser parser = CSVParser.parse(new File(path), Charset.forName("utf-8"), CSVFormat.DEFAULT.withRecordSeparator('\n'));
+		String csv = Files.readAllLines(Paths.get(path)).stream().collect(Collectors.joining("\r\n"));
+		CSVParser parser = CSVParser.parse(csv, CSVFormat.DEFAULT);
 		Map<String, List<CSVRecord>> csvModels = parser.getRecords().stream().collect(Collectors.groupingBy(record -> record.get(0).toString()));
 		return csvModels.values().stream().map(csvRecords -> eCoreModelFromCsv(csvRecords)).collect(Collectors.toList());
 	}

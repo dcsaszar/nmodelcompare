@@ -78,6 +78,18 @@ class IdMatchesTest
 				"App.renderTodoList", "Filter", "Filter.filterProp", "Footer.changeFilterProp", "Footer.countProp", "Footer.filterProp",
 				"Footer.renderFilter", "TodoItem.dataProp", "TodoList.renderFooter", "TodoList.renderHeader"),
 				names);
+
+		String allNames = matches.stream().filter(m -> m.size() == 2).map(l -> l.get(0).getFullName()).sorted().collect(Collectors.joining(","));
+		assertEquals("App," + "App.renderKeyStrokeHandler," + "App.renderStateProvider," + "ButtonWrapper," + "ButtonWrapper.changeModeProp,"
+						+ "ButtonWrapper.modeProp," + "CheckBox," + "CheckBox.handleChange," + "Filter.changeFilterProp," + "FilteredList,"
+						+ "FilteredList.changeStatusProp," + "FilteredList.itemsProp," + "FilteredList.renderTodoItem," + "Footer,"
+						+ "Footer.renderButtonWrapper," + "Header," + "Header.renderInputWrapper," + "Info," + "InputBox.handleChange,"
+						+ "InputBox.handleKeyUp," + "InputWrapper," + "InputWrapper.addNewProp," + "InputWrapper.modeProp," + "InputWrapper.queryProp,"
+						+ "InputWrapper.renderInputBox," + "InputWrapper.renderSearchBox," + "InputWrapper.setSearchQueryProp," + "KeyStrokeHandler,"
+						+ "KeyStrokeHandler.handleKeyUp," + "SearchBox," + "SearchBox.queryProp," + "SearchBox.setSearchQueryProp," + "StateProvider,"
+						+ "StateProvider.addNew," + "StateProvider.changeFilter," + "StateProvider.changeMode," + "StateProvider.changeStatus,"
+						+ "StateProvider.setSearchQuery," + "TodoItem," + "TodoItem.changeStatusProp," + "TodoItem.renderCheckBox," + "TodoList,"
+				+ "TodoList.renderFilteredList," + "TodoList.renderInfo", allNames);
 	}
 
 	@Test
@@ -89,7 +101,7 @@ class IdMatchesTest
 		Similarities similarities = world.findSimilarities(2.5);
 		Similarities remaining = new IdMatches(similarities).getRemaining();
 
-		assertEquals(63, remaining.get2DWidth(), 4); // TODO unstable
-		assertEquals(136, remaining.getAllIndexes().size(), 4); // TODO unstable
+		assertEquals(61, remaining.get2DWidth(), 5); // TODO unstable
+		assertEquals(134, remaining.getAllIndexes().size(), 6); // TODO unstable
 	}
 }
