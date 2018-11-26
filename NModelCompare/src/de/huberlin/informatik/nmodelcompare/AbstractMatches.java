@@ -82,10 +82,12 @@ public abstract class AbstractMatches
 		Node nodeB = nodePair.getValue1();
 		_matchesByNode.putIfAbsent(nodeA, new HashSet<Node>());
 		_matchesByNode.putIfAbsent(nodeB, new HashSet<Node>());
-		_matchesByNode.get(nodeA).add(nodeA);
-		_matchesByNode.get(nodeA).add(nodeB);
-		_matchesByNode.get(nodeA).addAll(_matchesByNode.get(nodeB));
-		_matchesByNode.put(nodeB, _matchesByNode.get(nodeA));
+		Set<Node> nodeAGroup = _matchesByNode.get(nodeA);
+		Set<Node> nodeBGroup = _matchesByNode.get(nodeB);
+		nodeAGroup.add(nodeA);
+		nodeAGroup.add(nodeB);
+		nodeAGroup.addAll(nodeBGroup);
+		nodeAGroup.stream().forEach(node -> _matchesByNode.put(node, nodeAGroup));
 	}
 
 	private boolean isAcceptableMatch(Pair<Node, Node> nodePair)

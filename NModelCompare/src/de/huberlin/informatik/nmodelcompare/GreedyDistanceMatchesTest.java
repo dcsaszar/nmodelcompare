@@ -2,7 +2,9 @@ package de.huberlin.informatik.nmodelcompare;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
@@ -47,5 +49,29 @@ class GreedyDistanceMatchesTest
 		assertEquals(20, matches.stream().map(List::size).filter(s -> s == 3).count());
 		assertEquals(35, matches.stream().map(List::size).filter(s -> s == 2).count());
 		assertEquals(55, matches.stream().filter(m -> m.size() > 1).count());
+	}
+
+	@Test
+	void fewMatchesContainNoDuplicates() throws IOException
+	{
+		NModelWorld world = NModelWorldLoader.load("testdata/small.csv");
+		Similarities similarities = world.findSimilarities(2);
+		List<List<Node>> matches = new GreedyDistanceMatches(similarities).getMatches();
+		List<Node> listOfNodes = matches.stream().flatMap(Collection::stream).collect(Collectors.toList());
+		Set<Node> setOfNodes = matches.stream().flatMap(Collection::stream).collect(Collectors.toSet());
+
+		assertEquals(setOfNodes.size(), listOfNodes.size());
+	}
+
+	@Test
+	void matchesContainNoDuplicates() throws IOException
+	{
+		NModelWorld world = NModelWorldLoader.load("testdata/hospitals_subset.csv");
+		Similarities similarities = world.findSimilarities(2.4);
+		List<List<Node>> matches = new GreedyDistanceMatches(similarities).getMatches();
+		List<Node> listOfNodes = matches.stream().flatMap(Collection::stream).collect(Collectors.toList());
+		Set<Node> setOfNodes = matches.stream().flatMap(Collection::stream).collect(Collectors.toSet());
+
+		assertEquals(setOfNodes.size(), listOfNodes.size());
 	}
 }
