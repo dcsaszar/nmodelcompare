@@ -64,4 +64,19 @@ class FlatModelTest
 		assertEquals("TodoList", nodes.get(5).getParentName());
 		assertEquals("TodoList", nodes.get(6).getParentName());
 	}
+
+	@Test
+	void storesNodeChildrenNames()
+	{
+		EPackageImpl model = ModelLoader.loadEcore(SIMPLE);
+		FlatModel flatModel = new FlatModel(model);
+		List<Node> nodes = flatModel.getNodes();
+		assertEquals(0, nodes.get(1).getChildrenNames().size());
+		assertEquals(0, nodes.get(2).getChildrenNames().size());
+		assertEquals(0, nodes.get(4).getChildrenNames().size());
+		assertEquals(0, nodes.get(5).getChildrenNames().size());
+		assertEquals(0, nodes.get(6).getChildrenNames().size());
+		assertEquals(2, nodes.get(0).getChildrenNames().size());
+		assertEquals(3, nodes.get(3).getChildrenNames().size());
+	}
 }

@@ -1,0 +1,4 @@
+1,CareTaker,id;office
+2,Physician,name;office
+2,Nurse,id;ward
+3,Nurse,name;ward

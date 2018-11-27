@@ -11,23 +11,26 @@ public class IndexVectorFactory
 	private Map<String, Integer> _parentNameDimension;
 	private Map<String, Integer> _nameDimension;
 	private Map<String, Integer> _nameSubstringDimension;
+	private Map<String, Integer> _childrenNamesDimension;
 	private final int _dimensions;
 
 	public IndexVectorFactory(List<Node> nodes)
 	{
-		fillLexicalIndex(nodes);
-		_dimensions = VectorDimension.DIMENSIONS + _parentNameDimension.size() + _nameDimension.size() + _nameSubstringDimension.size();
+		_dimensions = fillLexicalIndex(nodes);
 	}
 
-	private void fillLexicalIndex(List<Node> nodes)
+	private int fillLexicalIndex(List<Node> nodes)
 	{
-		Set<String> parentNames = nodes.stream().map((node) -> node.getParentName()).collect(Collectors.toSet());
-		Set<String> names = nodes.stream().map((node) -> node.getName()).collect(Collectors.toSet());
+		Set<String> parentNames = nodes.stream().map(Node::getParentName).collect(Collectors.toSet());
+		Set<String> names = nodes.stream().map(Node::getName).collect(Collectors.toSet());
+		Set<String> childrenNames = nodes.stream().flatMap(node -> node.getChildrenNames().stream()).collect(Collectors.toSet());
 		Set<String> nameSubstrings = names.stream().map(IndexVectorFactory::substrings).flatMap(Collection::stream).collect(Collectors.toSet());
 		AtomicInteger i = new AtomicInteger(VectorDimension.DIMENSIONS);
 		_parentNameDimension = parentNames.stream().collect(Collectors.toMap(s -> s, s -> i.getAndIncrement()));
 		_nameDimension = names.stream().collect(Collectors.toMap(s -> s, s -> i.getAndIncrement()));
 		_nameSubstringDimension = nameSubstrings.stream().collect(Collectors.toMap(s -> s, s -> i.getAndIncrement()));
+		_childrenNamesDimension = childrenNames.stream().collect(Collectors.toMap(s -> s, s -> i.getAndIncrement()));
+		return i.get();
 	}
 
 	private static Pattern PASCAL_OR_SNAKE = Pattern.compile("(([_A-Z]|^)[^_A-Z]+)|(([_A-Z]|^)+(?=$|[_A-Z][^_A-Z]))");
@@ -46,10 +49,12 @@ public class IndexVectorFactory
 	IndexVector vectorFor(Node node)
 	{
 		IndexVector v = new IndexVector(_dimensions);
-		v.setCoord(VectorDimension.LENGTH_OF_NAME, node.getName().length());
-		v.setCoord(VectorDimension.NUMBER_OF_ATTRIBUTES, node.getNumberOfAttributes());
-		v.setCoord(VectorDimension.NUMBER_OF_METHODS, node.getNumberOfMethods());
-		v.setCoord(VectorDimension.NUMBER_OF_REFERENCES, node.getNumberOfReferences());
+
+		v.setCoord(VectorDimension.INV_LENGTH_OF_NAME, 1d / node.getName().length());
+
+		v.setCoord(VectorDimension.INV_NUMBER_OF_ATTRIBUTES, 1d / (1 + node.getNumberOfAttributes()));
+		v.setCoord(VectorDimension.INV_NUMBER_OF_METHODS, 1d / (1 + node.getNumberOfMethods()));
+		v.setCoord(VectorDimension.INV_NUMBER_OF_REFERENCES, 1d / (1 + node.getNumberOfReferences()));
 
 		v.setCoord(VectorDimension.IS_ATTRIBUTE, node.getType() == "EAttribute" ? 1 : 0);
 		v.setCoord(VectorDimension.IS_CLASS, node.getType() == "EClass" ? 1 : 0);
@@ -59,7 +64,13 @@ public class IndexVectorFactory
 		v.setCoord(_parentNameDimension.get(node.getParentName()), 1);
 		v.setCoord(_nameDimension.get(node.getName()), 1);
 		substrings(node.getName()).stream().forEach(s -> v.setCoord(_nameSubstringDimension.get(s), 1));
+		node.getChildrenNames().stream().forEach(n -> v.setCoord(_childrenNamesDimension.get(n), 1));
 
 		return v;
+	}
+
+	public int getDimensions()
+	{
+		return _dimensions;
 	}
 }

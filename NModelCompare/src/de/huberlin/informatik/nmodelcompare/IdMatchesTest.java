@@ -70,18 +70,18 @@ class IdMatchesTest
 		List<List<Node>> matches = new IdMatches(similarities).getMatches();
 
 		assertEquals(54, matches.stream().filter(m -> m.size() > 1).count());
-		assertEquals(44, matches.stream().map(List::size).filter(s -> s == 2).count());
-		assertEquals(10, matches.stream().map(List::size).filter(s -> s == 3).count());
+		assertEquals(45, matches.stream().map(List::size).filter(s -> s == 2).count());
+		assertEquals(9, matches.stream().map(List::size).filter(s -> s == 3).count());
 
 		List<String> names = matches.stream().filter(m -> m.size() == 3).map(l -> l.get(0).getFullName()).sorted().collect(Collectors.toList());
 		assertEquals(Arrays.asList(
-				"App.renderTodoList", "Filter", "Filter.filterProp", "Footer.changeFilterProp", "Footer.countProp", "Footer.filterProp",
+				"App.renderTodoList", "Filter.filterProp", "Footer.changeFilterProp", "Footer.countProp", "Footer.filterProp",
 				"Footer.renderFilter", "TodoItem.dataProp", "TodoList.renderFooter", "TodoList.renderHeader"),
 				names);
 
 		String allNames = matches.stream().filter(m -> m.size() == 2).map(l -> l.get(0).getFullName()).sorted().collect(Collectors.joining(","));
 		assertEquals("App," + "App.renderKeyStrokeHandler," + "App.renderStateProvider," + "ButtonWrapper," + "ButtonWrapper.changeModeProp,"
-						+ "ButtonWrapper.modeProp," + "CheckBox," + "CheckBox.handleChange," + "Filter.changeFilterProp," + "FilteredList,"
+				+ "ButtonWrapper.modeProp," + "CheckBox," + "CheckBox.handleChange," + "Filter," + "Filter.changeFilterProp," + "FilteredList,"
 						+ "FilteredList.changeStatusProp," + "FilteredList.itemsProp," + "FilteredList.renderTodoItem," + "Footer,"
 						+ "Footer.renderButtonWrapper," + "Header," + "Header.renderInputWrapper," + "Info," + "InputBox.handleChange,"
 						+ "InputBox.handleKeyUp," + "InputWrapper," + "InputWrapper.addNewProp," + "InputWrapper.modeProp," + "InputWrapper.queryProp,"
@@ -101,7 +101,7 @@ class IdMatchesTest
 		Similarities similarities = world.findSimilarities(2.5);
 		Similarities remaining = new IdMatches(similarities).getRemaining();
 
-		assertEquals(61, remaining.get2DWidth(), 5); // TODO unstable
-		assertEquals(134, remaining.getAllIndexes().size(), 6); // TODO unstable
+		assertEquals(87, remaining.get2DWidth());
+		assertEquals(305, remaining.getAllIndexes().size());
 	}
 }

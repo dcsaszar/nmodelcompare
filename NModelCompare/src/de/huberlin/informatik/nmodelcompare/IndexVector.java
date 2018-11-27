@@ -18,6 +18,11 @@ public class IndexVector extends GenericPoint<Double>
 		setCoord(d.ordinal(), (double)v);
 	}
 
+	public void setCoord(VectorDimension d, double v)
+	{
+		super.setCoord(d.ordinal(), (double)v);
+	}
+
 	public void setCoord(int d, int v)
 	{
 		super.setCoord(d, (double)v);

@@ -18,10 +18,10 @@ class IndexVectorTest
 		FlatModel flatModel = new FlatModel(model);
 		IndexVectorFactory indexVectorFactory = new IndexVectorFactory(flatModel.getNodes());
 		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
-		assertEquals("MyTestClass".length(), indexVector.getCoord(VectorDimension.LENGTH_OF_NAME.ordinal()), E);
-		assertEquals(3, indexVector.getCoord(VectorDimension.NUMBER_OF_ATTRIBUTES.ordinal()), E);
-		assertEquals(2, indexVector.getCoord(VectorDimension.NUMBER_OF_METHODS.ordinal()), E);
-		assertEquals(1, indexVector.getCoord(VectorDimension.NUMBER_OF_REFERENCES.ordinal()), E);
+		assertEquals(1d / "MyTestClass".length(), indexVector.getCoord(VectorDimension.INV_LENGTH_OF_NAME.ordinal()), E);
+		assertEquals(1d / 4, indexVector.getCoord(VectorDimension.INV_NUMBER_OF_ATTRIBUTES.ordinal()), E);
+		assertEquals(1d / 3, indexVector.getCoord(VectorDimension.INV_NUMBER_OF_METHODS.ordinal()), E);
+		assertEquals(1d / 2, indexVector.getCoord(VectorDimension.INV_NUMBER_OF_REFERENCES.ordinal()), E);
 	}
 
 	@Test
@@ -30,7 +30,6 @@ class IndexVectorTest
 		FlatModel flatModel = new FlatModel(model);
 		IndexVectorFactory indexVectorFactory = new IndexVectorFactory(flatModel.getNodes());
 		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
-		assertEquals("MyTestClass".length(), indexVector.getCoord(VectorDimension.LENGTH_OF_NAME.ordinal()), E);
 		assertEquals(1, indexVector.getCoord(VectorDimension.IS_CLASS.ordinal()), E);
 		assertEquals(0, indexVector.getCoord(VectorDimension.IS_ATTRIBUTE.ordinal()), E);
 		assertEquals(0, indexVector.getCoord(VectorDimension.IS_OPERATION.ordinal()), E);
@@ -45,17 +44,26 @@ class IndexVectorTest
 		IndexVector indexVector = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
 		int d = indexVector.getDimensions();
 
-		assertEquals(26, d - VectorDimension.DIMENSIONS);
+		assertEquals(32, d - VectorDimension.DIMENSIONS);
+	}
 
-		double lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector.getCoord(i)).sum();
-		assertEquals(5, lexicalSum, E);
+	@Test
+	void lexicalValuesAreNonZero()
+	{
+		FlatModel flatModel = new FlatModel(model);
+		IndexVectorFactory indexVectorFactory = new IndexVectorFactory(flatModel.getNodes());
+		int d = indexVectorFactory.getDimensions();
+
+		IndexVector indexVector0 = indexVectorFactory.vectorFor(flatModel.getNodes().get(0));
+		double lexicalSum0 = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector0.getCoord(i)).sum();
+		assertEquals(11, lexicalSum0, E);
 
 		IndexVector indexVector1 = indexVectorFactory.vectorFor(flatModel.getNodes().get(1));
-		lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector1.getCoord(i)).sum();
-		assertEquals(4, lexicalSum, E);
+		double lexicalSum1 = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector1.getCoord(i)).sum();
+		assertEquals(4, lexicalSum1, E);
 
 		IndexVector indexVector2 = indexVectorFactory.vectorFor(flatModel.getNodes().get(2));
-		lexicalSum = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector2.getCoord(i)).sum();
-		assertEquals(4, lexicalSum, E);
+		double lexicalSum2 = IntStream.range(VectorDimension.DIMENSIONS, d).mapToDouble(i -> indexVector2.getCoord(i)).sum();
+		assertEquals(4, lexicalSum2, E);
 	}
 }

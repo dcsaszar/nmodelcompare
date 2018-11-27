@@ -1,7 +1,9 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.eclipse.emf.ecore.*;
 import org.eclipse.emf.ecore.impl.ENamedElementImpl;
 
 public class Node
@@ -74,5 +76,11 @@ public class Node
 	{
 		EObject eContainer = _eObject.eContainer();
 		return (eContainer instanceof EPackage) ? null : ((ENamedElementImpl)eContainer).getName();
+	}
+
+	public List<String> getChildrenNames()
+	{
+		return _eObject.eContents().stream().filter(o -> o instanceof ENamedElement).map(o -> ((ENamedElement)o).getName())
+				.collect(Collectors.toList());
 	}
 }

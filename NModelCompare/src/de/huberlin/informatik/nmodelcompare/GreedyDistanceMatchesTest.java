@@ -46,8 +46,8 @@ class GreedyDistanceMatchesTest
 		List<List<Node>> matches = new GreedyDistanceMatches(similarities).getMatches();
 
 		assertEquals(0, matches.stream().filter(m -> m.size() > 3).count());
-		assertEquals(20, matches.stream().map(List::size).filter(s -> s == 3).count());
-		assertEquals(35, matches.stream().map(List::size).filter(s -> s == 2).count());
+		assertEquals(24, matches.stream().map(List::size).filter(s -> s == 3).count());
+		assertEquals(31, matches.stream().map(List::size).filter(s -> s == 2).count());
 		assertEquals(55, matches.stream().filter(m -> m.size() > 1).count());
 	}
 
@@ -73,5 +73,37 @@ class GreedyDistanceMatchesTest
 		Set<Node> setOfNodes = matches.stream().flatMap(Collection::stream).collect(Collectors.toSet());
 
 		assertEquals(setOfNodes.size(), listOfNodes.size());
+	}
+
+	@Test
+	void mergesAccordingToRubin1b() throws IOException
+	{
+		NModelWorld world = NModelWorldLoader.load("testdata/rubin1a.csv");
+		Similarities similarities = world.findSimilarities(2.5);
+		List<List<Node>> matches = new GreedyDistanceMatches(similarities).getMatches();
+		List<List<Node>> classMatches = matches.stream().filter(match -> match.stream().anyMatch(node -> node.getType() == "EClass"))
+				.collect(Collectors.toList());
+
+		assertEquals(2, classMatches.size());
+		assertEquals(2, classMatches.get(0).size());
+		assertEquals("CareTaker-M1", classMatches.get(0).get(0).getDescription());
+		assertEquals("Physician-M2", classMatches.get(0).get(1).getDescription());
+		assertEquals(2, classMatches.get(1).size());
+		assertEquals("Nurse-M2", classMatches.get(1).get(0).getDescription());
+		assertEquals("Nurse-M3", classMatches.get(1).get(1).getDescription());
+	}
+
+	@Test
+	void mergesAccordingToRubin1d() throws IOException
+	{
+		NModelWorld world = NModelWorldLoader.load("testdata/rubin1c.csv");
+		Similarities similarities = world.findSimilarities(5);
+		List<List<Node>> matches = new GreedyDistanceMatches(similarities).getMatches();
+		List<List<Node>> classMatches = matches.stream().filter(match -> match.stream().anyMatch(node -> node.getType() == "EClass"))
+				.collect(Collectors.toList());
+
+		assertEquals(2, classMatches.size());
+		assertEquals(3, classMatches.get(0).size());
+		assertEquals(1, classMatches.get(1).size());
 	}
 }
