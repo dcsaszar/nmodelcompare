@@ -97,7 +97,7 @@ class GreedyDistanceMatchesTest
 	void mergesAccordingToRubin1d() throws IOException
 	{
 		NModelWorld world = NModelWorldLoader.load("testdata/rubin1c.csv");
-		Similarities similarities = world.findSimilarities(5);
+		Similarities similarities = world.findSimilarities(2.5);
 		List<List<Node>> matches = new GreedyDistanceMatches(similarities).getMatches();
 		List<List<Node>> classMatches = matches.stream().filter(match -> match.stream().anyMatch(node -> node.getType() == "EClass"))
 				.collect(Collectors.toList());
