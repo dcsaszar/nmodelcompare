@@ -83,4 +83,10 @@ public class Node
 		return _eObject.eContents().stream().filter(o -> o instanceof ENamedElement).map(o -> ((ENamedElement)o).getName())
 				.collect(Collectors.toList());
 	}
+
+	@Override
+	public String toString()
+	{
+		return getDescription();
+	}
 }
