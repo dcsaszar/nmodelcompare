@@ -29,9 +29,7 @@ public class NodeIndex
 		IndexVector indexVector = _indexVectorFactory.vectorFor(node);
 		if (_tree.containsKey(indexVector))
 		{
-			ArrayList<Node> nodes = _tree.get(indexVector);
-			nodes.add(node);
-			_tree.put(indexVector, nodes);
+			_tree.get(indexVector).add(node);
 		}
 		else
 		{
