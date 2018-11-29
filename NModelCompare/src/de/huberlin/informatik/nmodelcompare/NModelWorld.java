@@ -4,13 +4,20 @@ import java.util.List;
 
 public class NModelWorld
 {
-	private NodeIndex _nodeIndex;
-	private List<Node> _nodes;
+	private final NodeIndex _nodeIndex;
+	private final List<Node> _nodes;
+	private final int _numberOfInputModels;
 
-	public NModelWorld(List<Node> nodes)
+	public NModelWorld(List<Node> nodes, int numberOfInputModels)
 	{
 		_nodes = nodes;
 		_nodeIndex = new NodeIndex(nodes);
+		_numberOfInputModels = numberOfInputModels;
+	}
+
+	public int getNumberOfInputModels()
+	{
+		return _numberOfInputModels;
 	}
 
 	public List<Node> getNodes()

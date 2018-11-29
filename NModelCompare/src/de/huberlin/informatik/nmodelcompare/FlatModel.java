@@ -25,18 +25,18 @@ public class FlatModel
 			String className = o.eClass().getName();
 			switch (className)
 			{
-			case "EClass":
-			case "EReference":
-			case "EAttribute":
-			case "EOperation":
-				_nodes.add(new Node(this, o));
-				break;
-			case "EAnnotation":
-			case "EGenericType":
-			case "EStringToStringMapEntry":
-				break;
-			default:
-				throw new Error("Unknown class " + className);
+				case "EClass":
+				case "EReference":
+				case "EAttribute":
+				case "EOperation":
+					_nodes.add(new Node(this, o));
+					break;
+				case "EAnnotation":
+				case "EGenericType":
+				case "EStringToStringMapEntry":
+					break;
+				default:
+					throw new Error("Unknown class " + className);
 			}
 		});
 	}

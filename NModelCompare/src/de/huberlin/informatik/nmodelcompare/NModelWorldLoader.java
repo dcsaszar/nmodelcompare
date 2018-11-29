@@ -8,34 +8,65 @@ import org.eclipse.emf.ecore.EPackage;
 
 public class NModelWorldLoader
 {
-	public static NModelWorld load(String... filenames) throws IOException
+	public enum Option
+	{
+		ALL, CLASSES_ONLY
+	}
+
+	private Option _option;
+
+	public NModelWorldLoader(Option option)
+	{
+		_option = option;
+	}
+
+	public static NModelWorld load(Option option, String... filenames) throws IOException
 	{
 		if (filenames.length == 1) {
-			return loadCsv(filenames[0]);
+			return new NModelWorldLoader(option).loadCsv(filenames[0]);
 		}
-		return loadEcore(filenames);
+		return new NModelWorldLoader(option).loadEcoreModels(filenames);
+	}
+
+	public static NModelWorld load(String... filenames) throws IOException
+	{
+		return load(Option.ALL, filenames);
 	}
 
 	public static NModelWorld loadEcore(String... filenames)
 	{
+		try {
+			return load(filenames);
+		}
+		catch (IOException e) {
+			throw new Error(e);
+		}
+	}
+
+	private NModelWorld loadEcoreModels(String[] filenames)
+	{
 		return fillNModelWorld(Arrays.stream(filenames).map(path -> ModelLoader.loadEcore(path)).collect(Collectors.toList()));
 	}
 
-	public static NModelWorld loadCsv(String filename) throws IOException
+	private NModelWorld loadCsv(String filename) throws IOException
 	{
 		return fillNModelWorld(ModelLoader.loadCsv(filename));
 	}
 
-	public static NModelWorld fillNModelWorld(List<EPackage> ecoreModels)
+	private NModelWorld fillNModelWorld(List<EPackage> ecoreModels)
 	{
 		List<Node> nodes = new ArrayList<Node>();
 		int i = 1;
 		for (EPackage model : ecoreModels) {
 			FlatModel flatModel = new FlatModel(model, i);
-			nodes.addAll(flatModel.getNodes());
+			List<Node> flatModelNodes = flatModel.getNodes();
+			if (_option == Option.CLASSES_ONLY) {
+				flatModelNodes = flatModelNodes.stream().filter(node -> node.getType().equals("EClass")).collect(Collectors.toList());
+			}
+			nodes.addAll(flatModelNodes);
 			i++;
 		}
-		NModelWorld result = new NModelWorld(nodes);
+		NModelWorld result = new NModelWorld(nodes, ecoreModels.size());
 		return result;
 	}
 }
