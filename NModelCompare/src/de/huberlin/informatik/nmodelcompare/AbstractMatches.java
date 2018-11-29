@@ -11,6 +11,7 @@ public abstract class AbstractMatches
 	protected Similarities _similarities;
 	private HashMap<Node, Set<Node>> _matchesByNode;
 	private Similarities _remainingSimilarities;
+	private Set<Set<Node>> _matchesSet;
 
 	public AbstractMatches(Similarities similarities)
 	{
@@ -33,6 +34,7 @@ public abstract class AbstractMatches
 		_remainingSimilarities = keptSimilarities;
 
 		Set<Set<Node>> uniqueMatches = _matchesByNode.values().stream().collect(Collectors.toSet());
+		_matchesSet = uniqueMatches;
 		_matchesList = new MatchesList(uniqueMatches);
 	}
 
@@ -118,5 +120,10 @@ public abstract class AbstractMatches
 	public MatchesList getMatchesList()
 	{
 		return _matchesList;
+	}
+
+	public Set<Set<Node>> getMatchesSet()
+	{
+		return _matchesSet;
 	}
 }
