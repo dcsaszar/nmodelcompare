@@ -16,22 +16,23 @@ public class MeasureNwmWeight
 	public static void main(String... args) throws IOException
 	{
 		for (String testCase : RUBIN_TEST_CASES) {
-			Option option = testCase.startsWith("random") ? Option.CLASSES_ONLY : Option.ALL;
-			System.out.println("Using " + testCase + " dataset (" + option + ")...");
-			Instant startedAt = Instant.now();
-			NModelWorld world = NModelWorldLoader.load(option, "testdata/" + testCase + ".csv");
-			Instant loadedAt = Instant.now();
-			Similarities allSimilarities = world.findSimilarities(2.5);
-			Instant foundSimilaritiesAt = Instant.now();
-			AbstractMatches matches = new GreedyDistanceMatches(allSimilarities);
-			Instant finishedAt = Instant.now();
-			NwmWeight nwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels());
-			System.out.println(" Weight:  " + nwmWeight.sum());
-			System.out.println(" Time:    " + toSeconds(startedAt, finishedAt));
-			System.out.println("  load:   " + toSeconds(startedAt, loadedAt));
-			System.out.println("  search: " + toSeconds(loadedAt, foundSimilaritiesAt));
-			System.out.println("  match:  " + toSeconds(foundSimilaritiesAt, finishedAt));
-			System.out.println();
+			for (Option option : testCase.startsWith("random") ? Arrays.asList(Option.CLASSES_ONLY) : Arrays.asList(Option.ALL, Option.CLASSES_ONLY)) {
+				System.out.println("Using " + testCase + " dataset (" + option + ")...");
+				Instant startedAt = Instant.now();
+				NModelWorld world = NModelWorldLoader.load(option, "testdata/" + testCase + ".csv");
+				Instant loadedAt = Instant.now();
+				Similarities allSimilarities = world.findSimilarities(2.5);
+				Instant foundSimilaritiesAt = Instant.now();
+				AbstractMatches matches = new GreedyDistanceMatches(allSimilarities);
+				Instant finishedAt = Instant.now();
+				NwmWeight nwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels());
+				System.out.println(" Weight:  " + nwmWeight.sum());
+				System.out.println(" Time:    " + toSeconds(startedAt, finishedAt));
+				System.out.println("  load:   " + toSeconds(startedAt, loadedAt));
+				System.out.println("  search: " + toSeconds(loadedAt, foundSimilaritiesAt));
+				System.out.println("  match:  " + toSeconds(foundSimilaritiesAt, finishedAt));
+				System.out.println();
+			}
 		}
 	}
 
