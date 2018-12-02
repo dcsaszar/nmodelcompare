@@ -10,23 +10,23 @@ import com.savarese.spatial.NearestNeighbors.Entry;
 
 public class NodeIndex
 {
-	private final KDTree<Double, IndexVector, ArrayList<Node>> _tree;
+	private final KDTree<Double, IndexVector, List<Node>> _tree = new KDTree<>();
 	private IndexVectorFactory _indexVectorFactory;
-	private NearestNeighbors<Double, IndexVector, ArrayList<Node>> _nearestNeighbors;
+	private NearestNeighbors<Double, IndexVector, List<Node>> _nearestNeighbors = new NearestNeighbors<>();
+	private HashMap<Node, IndexVector> _indexVectorForNode;
 
 	public NodeIndex(List<Node> nodes)
 	{
-		_tree = new KDTree<>();
-		_nearestNeighbors = new NearestNeighbors<>();
+		_indexVectorForNode = new HashMap<Node, IndexVector>(nodes.size());
 
 		_indexVectorFactory = new IndexVectorFactory(nodes);
 		nodes.stream().forEach(node -> add(node));
-		_tree.optimize();
 	}
 
 	private void add(Node node)
 	{
 		IndexVector indexVector = _indexVectorFactory.vectorFor(node);
+		_indexVectorForNode.put(node, indexVector);
 		if (_tree.containsKey(indexVector))
 		{
 			_tree.get(indexVector).add(node);
@@ -39,11 +39,10 @@ public class NodeIndex
 
 	public List<QueryResult> findNearby(Node node, double distance)
 	{
-		// TODO possible optimizations:
-		// * query with bounding box around queryPoint
-		// * iterate with increasing numNeighbors
-		IndexVector queryPoint = _indexVectorFactory.vectorFor(node);
-		Stream<Entry<Double, IndexVector, ArrayList<Node>>> entries = Arrays.stream(_nearestNeighbors.get(_tree, queryPoint, _tree.size(), false));
+		IndexVector queryPoint = _indexVectorForNode.get(node);
+
+		Entry<Double, IndexVector, List<Node>>[] nearestNeighbors = _nearestNeighbors.get(_tree, queryPoint, _tree.size(), false);
+		Stream<Entry<Double, IndexVector, List<Node>>> entries = Arrays.stream(nearestNeighbors);
 
 		Stream<List<QueryResult>> results = entries.filter(entry -> entry.getDistance() <= distance)
 				.map(entry -> entry.getNeighbor().getValue().stream().map(n -> new QueryResult(n, entry.getDistance())).collect(Collectors.toList()));
@@ -53,8 +52,8 @@ public class NodeIndex
 
 	public List<QueryResult> findAllByDistance(Node node)
 	{
-		IndexVector queryPoint = _indexVectorFactory.vectorFor(node);
-		Stream<Entry<Double, IndexVector, ArrayList<Node>>> entries = Arrays.stream(_nearestNeighbors.get(_tree, queryPoint, _tree.size(), false));
+		IndexVector queryPoint = _indexVectorForNode.get(node);
+		Stream<Entry<Double, IndexVector, List<Node>>> entries = Arrays.stream(_nearestNeighbors.get(_tree, queryPoint, _tree.size(), false));
 
 		Stream<List<QueryResult>> results = entries
 				.map(entry -> entry.getNeighbor().getValue().stream().map(n -> new QueryResult(n, entry.getDistance())).collect(Collectors.toList()));
