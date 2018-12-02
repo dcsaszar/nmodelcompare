@@ -7,6 +7,7 @@ import org.ujmp.core.Matrix;
 import org.ujmp.core.genericmatrix.impl.DefaultDenseGenericMatrix2D;
 
 import de.huberlin.informatik.nmodelcompare.*;
+import de.huberlin.informatik.nmodelcompare.NModelWorldLoader.Option;
 
 public class VisualizeSimilarityMatrix
 {
@@ -15,7 +16,7 @@ public class VisualizeSimilarityMatrix
 		NModelWorld world = NModelWorldLoader.load(args);
 		if (world.getNodes().size() == 0) {
 			System.out.println("Using fallback dataset.");
-			world = NModelWorldLoader.load("testdata/hospitals.csv");
+			world = NModelWorldLoader.load(Option.CLASSES_ONLY, "testdata/random_subset.csv");
 			// world =
 			// NModelWorldLoader.loadEcore("testdata/react_todo_app_2017021115_Akasky70_react_todo_app_step_10_c15f550b.ecore",
 			// "testdata/react_todo_app_2017021519_Akasky70_react_todo_app_step_15_4fe6b982.ecore",

@@ -34,7 +34,7 @@ public class MatchesList
 				return description;
 			}
 			String prev = match.get(i - 1).getFullNameTyped();
-			return description.startsWith(prev) ? description.replaceFirst(prev, "") : description;
+			return description.startsWith(prev) ? description.substring(prev.length()) : description;
 		}).collect(Collectors.joining(","));
 	}
 }

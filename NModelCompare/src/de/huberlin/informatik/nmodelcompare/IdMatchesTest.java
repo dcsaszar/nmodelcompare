@@ -2,6 +2,7 @@ package de.huberlin.informatik.nmodelcompare;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +59,22 @@ class IdMatchesTest
 				matches.stream().filter(m -> m.size() == 2).map(l -> l.get(0).getFullName()).collect(Collectors.toList()));
 		assertEquals(Arrays.asList("OneThreeTwo"),
 				matches.stream().filter(m -> m.size() == 3).map(l -> l.get(0).getFullName()).collect(Collectors.toList()));
+	}
+
+	@Test
+	void matchesOfOneHundredModels() throws IOException
+	{
+		NModelWorld world = NModelWorldLoader.load("testdata/random_subset.csv");
+		Similarities similarities = world.findSimilarities(1.9);
+		List<List<Node>> unsortedMatches = new IdMatches(similarities).getMatches();
+
+		assertEquals(6, unsortedMatches.stream().filter(m -> m.size() > 1).count());
+		assertEquals(6, unsortedMatches.stream().map(List::size).filter(s -> s == 2).count());
+
+		List<List<Node>> matches = unsortedMatches.stream().sorted((o1, o2) -> o1.get(0).getFullName().compareTo(o2.get(0).getFullName()))
+				.collect(Collectors.toList());
+		assertEquals(Arrays.asList("[24,39]", "[24,39].24", "[24,39].39", "[4,39]", "[4,39].39", "[4,39].4"),
+				matches.stream().filter(m -> m.size() == 2).map(l -> l.get(0).getFullName()).collect(Collectors.toList()));
 	}
 
 	@Test

@@ -43,12 +43,24 @@ class ModelLoaderTest
 	}
 
 	@Test
-	void generatesMultipleEcoreModelsFromCsvFilex() throws IOException
+	void convertsEcoreClassAndAttributesFromCsvFile() throws IOException
 	{
 		EPackage model = ModelLoader.loadCsv(CSV).get(2);
 		assertEquals(38, model.getEClassifiers().size());
 		assertEquals("IntraWardStay", model.getEClassifiers().get(14).getName());
 		assertEquals(7, model.getEClassifiers().get(14).eContents().size());
 		assertEquals("roomOrUnitCheckInDate", ((EAttribute)model.getEClassifiers().get(14).eContents().get(1)).getName());
+	}
+
+	@Test
+	void handlesRubinRandomCsvFile() throws IOException
+	{
+		List<EPackage> models = ModelLoader.loadCsv("testdata/random.csv");
+		assertEquals(100, models.size());
+		assertEquals("51", models.get(50).getName());
+		assertEquals(34, models.get(50).getEClassifiers().size());
+		assertEquals("[152,181,1,17,8,156,27,192,29]", models.get(50).getEClassifiers().get(7).getName());
+		assertEquals(9, models.get(50).getEClassifiers().get(7).eContents().size());
+		assertEquals("156", ((EAttribute)models.get(50).getEClassifiers().get(7).eContents().get(5)).getName());
 	}
 }

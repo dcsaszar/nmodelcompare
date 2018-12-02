@@ -3,8 +3,7 @@ package de.huberlin.informatik.nmodelcompare;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.csv.*;
@@ -35,7 +34,8 @@ public class ModelLoader
 	{
 		String csv = Files.readAllLines(Paths.get(path)).stream().collect(Collectors.joining("\r\n"));
 		CSVParser parser = CSVParser.parse(csv, CSVFormat.DEFAULT);
-		Map<String, List<CSVRecord>> csvModels = parser.getRecords().stream().collect(Collectors.groupingBy(record -> record.get(0).toString()));
+		Map<String, List<CSVRecord>> csvModels = parser.getRecords().stream()
+				.collect(Collectors.groupingBy(record -> record.get(0), LinkedHashMap::new, Collectors.toList()));
 		return csvModels.values().stream().map(csvRecords -> eCoreModelFromCsv(csvRecords)).collect(Collectors.toList());
 	}
 	
