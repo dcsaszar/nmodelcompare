@@ -27,18 +27,26 @@ public class MeasureNwmWeight
 				Instant finishedAt = Instant.now();
 				NwmWeight nwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels());
 				System.out.println(" Weight:  " + nwmWeight.sum());
-				System.out.println(" Time:    " + toSeconds(startedAt, finishedAt));
-				System.out.println("  load:   " + toSeconds(startedAt, loadedAt));
-				System.out.println("  search: " + toSeconds(loadedAt, foundSimilaritiesAt));
-				System.out.println("  match:  " + toSeconds(foundSimilaritiesAt, finishedAt));
+				System.out.println(" Time:    " + toRubinCpuSeconds(startedAt, finishedAt));
+				System.out.println("  load:   " + toRubinCpuSeconds(startedAt, loadedAt));
+				System.out.println("  search: " + toRubinCpuSeconds(loadedAt, foundSimilaritiesAt));
+				System.out.println("  match:  " + toRubinCpuSeconds(foundSimilaritiesAt, finishedAt));
 				System.out.println();
 			}
 		}
+
+		System.out.println("¹ Times are normalized to an Intel(R) Core(TM)2 Quad CPU Q8200 @ 2.33GHz");
 	}
 
-	private static double toSeconds(Instant startedAt, Instant finishedAt)
+	private static String toRubinCpuSeconds(Instant startedAt, Instant finishedAt)
 	{
+		/*
+		 * https://www.cpubenchmark.net/cpu.php?id=2713
+		 * https://www.cpubenchmark.net/cpu.php?id=1040
+		 */
+		double TIME_FACTOR = 5648d / 2812d;
+
 		long timeElapsedMillis = Duration.between(startedAt, finishedAt).toMillis();
-		return timeElapsedMillis / 1000d;
+		return Math.round(TIME_FACTOR * timeElapsedMillis) / 1000d + "s¹";
 	}
 }
