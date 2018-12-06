@@ -29,7 +29,7 @@ public class NwmWeight
 		return _classMatches.stream().mapToDouble(match -> nonNormalizedWeightForTuple(match)).sum() / (_numberOfInputModels * _numberOfInputModels);
 	}
 
-	public static double nonNormalizedWeightForTuple(Set<Node> match)
+	public static double nonNormalizedWeightForTuple(Collection<Node> match)
 	{
 		List<Set<String>> matchProperties = match.stream()
 				.map(node -> Stream.concat(Arrays.asList(node.getName()).stream(), node.getChildrenNames().stream()).collect(Collectors.toSet()))
