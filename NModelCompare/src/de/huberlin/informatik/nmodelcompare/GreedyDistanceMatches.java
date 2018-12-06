@@ -1,6 +1,6 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.javatuples.Pair;
@@ -13,7 +13,7 @@ public class GreedyDistanceMatches extends AbstractMatches
 	}
 
 	@Override
-	Collection<Pair<Node, Node>> getPairsByPriority()
+	List<Pair<Node, Node>> getPairsByPriority()
 	{
 		return getSimilarities().getAllIndexes().stream()
 				.sorted((a, b) -> Double.compare(getSimilarities().getDistance(a), getSimilarities().getDistance(b))).collect(Collectors.toList());

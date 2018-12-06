@@ -23,7 +23,7 @@ public class MeasureNwmWeight
 				Instant loadedAt = Instant.now();
 				Similarities allSimilarities = world.findSimilarities(2.5);
 				Instant foundSimilaritiesAt = Instant.now();
-				AbstractMatches matches = new GreedyDistanceMatches(allSimilarities);
+				AbstractMatches matches = new WeightOptimizedMatches(allSimilarities);
 				Instant finishedAt = Instant.now();
 				NwmWeight nwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels());
 				System.out.println(" Weight:  " + nwmWeight.sum());

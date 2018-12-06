@@ -17,11 +17,15 @@ public abstract class AbstractMatches
 	{
 		_similarities = similarities;
 		_matchesByNode = new HashMap<>();
-		getPairsByPriority().stream().forEach(nodePair -> {
+		similarities.getNodes().forEach(node -> _matchesByNode.put(node, new HashSet<Node>(Arrays.asList(node))));
+		List<Pair<Node, Node>> remainingPairs = getPairsByPriority();
+		while (!remainingPairs.isEmpty()) {
+			Pair<Node, Node> nodePair = chooseNextPair(remainingPairs);
 			if (isAcceptableMatch(nodePair)) {
 				addMatch(nodePair);
 			}
-		});
+			remainingPairs.remove(nodePair);
+		}
 
 		Set<Pair<Node, Node>> keptPairs = getPairsByPriority().stream()
 				.filter(pair -> isIdWithoutMatch(pair) || (isDisjoint(pair) && isFittingMatch(pair)))
@@ -38,7 +42,12 @@ public abstract class AbstractMatches
 		_matchesList = new MatchesList(uniqueMatches);
 	}
 
-	abstract Collection<Pair<Node, Node>> getPairsByPriority();
+	Pair<Node, Node> chooseNextPair(List<Pair<Node, Node>> pairs)
+	{
+		return pairs.get(0);
+	}
+
+	abstract List<Pair<Node, Node>> getPairsByPriority();
 
 	abstract boolean isAcceptablePair(Pair<Node, Node> nodePair);
 
@@ -70,10 +79,8 @@ public abstract class AbstractMatches
 			return false;
 		}
 		Set<Node> group = new HashSet<Node>();
-		group.addAll(_matchesByNode.getOrDefault(nodeA, new HashSet<Node>()));
-		group.addAll(_matchesByNode.getOrDefault(nodeB, new HashSet<Node>()));
-		group.add(nodeA);
-		group.add(nodeB);
+		group.addAll(_matchesByNode.get(nodeA));
+		group.addAll(_matchesByNode.get(nodeB));
 		long modelCount = group.stream().map(Node::getModelId).distinct().count();
 		return group.size() == modelCount;
 	}
@@ -82,11 +89,8 @@ public abstract class AbstractMatches
 	{
 		Node nodeA = nodePair.getValue0();
 		Node nodeB = nodePair.getValue1();
-		_matchesByNode.putIfAbsent(nodeA, new HashSet<Node>());
-		_matchesByNode.putIfAbsent(nodeB, new HashSet<Node>());
 		Set<Node> nodeAGroup = _matchesByNode.get(nodeA);
 		Set<Node> nodeBGroup = _matchesByNode.get(nodeB);
-		nodeAGroup.add(nodeA);
 		nodeAGroup.add(nodeB);
 		nodeAGroup.addAll(nodeBGroup);
 		nodeAGroup.stream().forEach(node -> _matchesByNode.put(node, nodeAGroup));
@@ -106,6 +110,11 @@ public abstract class AbstractMatches
 			return false;
 		}
 		return isFittingMatch(nodePair);
+	}
+
+	Set<Node> getMatchesForNode(Node node)
+	{
+		return Collections.unmodifiableSet(_matchesByNode.get(node));
 	}
 
 	public List<List<Node>> getMatches()

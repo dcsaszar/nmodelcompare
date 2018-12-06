@@ -1,6 +1,7 @@
 package de.huberlin.informatik.nmodelcompare;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.javatuples.Pair;
 
@@ -12,9 +13,9 @@ public class IdMatches extends AbstractMatches
 	}
 
 	@Override
-	Collection<Pair<Node, Node>> getPairsByPriority()
+	List<Pair<Node, Node>> getPairsByPriority()
 	{
-		return getSimilarities().getAllIndexes();
+		return new ArrayList<>(getSimilarities().getAllIndexes());
 	}
 
 	@Override
