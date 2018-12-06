@@ -12,27 +12,27 @@ public class ReproduceRubinPw
 	public static void main(String... args) throws IOException
 	{
 		NModelWorld world = NModelWorldLoader.load(Option.CLASSES_ONLY, "testdata/random.csv");
-		List<Node> allNodes = world.getNodes();
-		System.out.println("Input: " + allNodes);
+		List<Node> nodes = world.getNodes();
+		System.out.println("Input (" + world.getNumberOfInputModels() + " models, " + nodes.size() + " classes): " + nodes);
 		Set<List<Node>> matches = new HashSet<>();
-		while (allNodes.size() >= 2) {
-			Node nodeA = allNodes.get(0);
-			allNodes.remove(nodeA);
+		while (nodes.size() >= 2) {
+			Node nodeA = nodes.get(0);
+			nodes.remove(nodeA);
 			Integer modelId = nodeA.getModelId();
-			Stream<Node> validNodes = allNodes.parallelStream().filter(nodeB -> modelId != nodeB.getModelId());
+			Stream<Node> validNodes = nodes.parallelStream().filter(nodeB -> modelId != nodeB.getModelId());
 			Optional<Node> bestNode = validNodes
 					.max(Comparator.comparingDouble(nodeB -> NwmWeight.nonNormalizedWeightForTuple(Arrays.asList(nodeA, nodeB))));
 			if (bestNode.isPresent()) {
 				List<Node> bestPair = Arrays.asList(nodeA, bestNode.get());
 				double weight = NwmWeight.nonNormalizedWeightForTuple(bestPair);
 				if (weight > 0) {
-					allNodes.remove(bestNode.get());
+					nodes.remove(bestNode.get());
 					matches.add(bestPair);
 				}
 			}
 			double weightSum = new NwmWeight(matches, world.getNumberOfInputModels()).sum();
-			System.out.println("Left: " + allNodes.size() + " Weight: " + weightSum);
+			System.out.println("Left: " + nodes.size() + " Weight: " + weightSum);
 		}
-		System.out.println("Matches: " + matches);
+		System.out.println("Matches (" + matches.size() + "): " + matches);
 	}
 }
