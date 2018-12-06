@@ -24,8 +24,11 @@ public class ReproduceRubinPw
 					.max(Comparator.comparingDouble(nodeB -> NwmWeight.nonNormalizedWeightForTuple(Arrays.asList(nodeA, nodeB))));
 			if (bestNode.isPresent()) {
 				List<Node> bestPair = Arrays.asList(nodeA, bestNode.get());
-				allNodes.remove(bestNode.get());
-				matches.add(bestPair);
+				double weight = NwmWeight.nonNormalizedWeightForTuple(bestPair);
+				if (weight > 0) {
+					allNodes.remove(bestNode.get());
+					matches.add(bestPair);
+				}
 			}
 			double weightSum = new NwmWeight(matches, world.getNumberOfInputModels()).sum();
 			System.out.println("Left: " + allNodes.size() + " Weight: " + weightSum);
