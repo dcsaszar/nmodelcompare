@@ -16,11 +16,15 @@ public class WeightOptimizedMatches extends AbstractMatches
 	List<Pair<Node, Node>> getPairsByPriority()
 	{
 		Map<Pair<Node, Node>, Double> weightForPair = new HashMap<>();
+		Map<Pair<Node, Node>, String> stringForPair = new HashMap<>();
 		getSimilarities().getAllIndexes().forEach(nodePair -> {
 			double weight = NwmWeight.nonNormalizedWeightForTuple(new HashSet<>(Arrays.asList(nodePair.getValue0(), nodePair.getValue1())));
 			weightForPair.put(nodePair, weight);
+			stringForPair.put(nodePair, nodePair.getValue0().getFullName() + nodePair.getValue1().getFullName());
 		});
-		return getSimilarities().getAllIndexes().stream().sorted(Comparator.comparing(p -> -weightForPair.get(p))).collect(Collectors.toList());
+		return getSimilarities().getAllIndexes().stream()
+				.sorted(Comparator.comparingDouble(pair -> -weightForPair.get(pair)).thenComparing(pair -> stringForPair.get(pair)))
+				.collect(Collectors.toList());
 	}
 
 	@Override

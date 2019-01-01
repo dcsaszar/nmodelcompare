@@ -21,9 +21,9 @@ class WeightOptimizedMatchesTest
 		NwmWeight greedyMatchesWeight = new NwmWeight(greedyMatches, 10, true);
 		NwmWeight weightOptimizedMatchesWeight = new NwmWeight(weightOptimizedMatches, 10, true);
 
-		assertEquals(0.3d, greedyMatchesWeight.sum(), 0.01d); // TODO: unstable
+		assertEquals(0.2705d, greedyMatchesWeight.sum(), 0.0001d);
 		assertTrue(weightOptimizedMatchesWeight.sum() > greedyMatchesWeight.sum());
-		assertEquals(0.53d, weightOptimizedMatchesWeight.sum(), 0.01d); // TODO: unstable
+		assertEquals(0.4841d, weightOptimizedMatchesWeight.sum(), 0.0001d);
 	}
 
 	@Test
@@ -35,6 +35,6 @@ class WeightOptimizedMatchesTest
 		Set<Set<Node>> weightOptimizedMatches = new WeightOptimizedMatches(similarities).getMatchesSet();
 		NwmWeight weightOptimizedMatchesWeight = new NwmWeight(weightOptimizedMatches, 10, true);
 
-		assertEquals(1.03d, weightOptimizedMatchesWeight.sum(), 0.02d); // TODO: unstable
+		assertEquals(1.0325d, weightOptimizedMatchesWeight.sum(), 0.0001d);
 	}
 }
