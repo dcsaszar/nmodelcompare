@@ -9,11 +9,16 @@ import org.eclipse.emf.ecore.impl.ENamedElementImpl;
 public class Node
 {
 	private EObject _eObject;
-	private FlatModel _flatModel;
+	private String _modelId;
 
 	public Node(FlatModel flatModel, EObject eObject)
 	{
-		_flatModel = flatModel;
+		this(String.valueOf(flatModel.getId()), eObject);
+	}
+
+	public Node(String modelId, EObject eObject)
+	{
+		_modelId = modelId;
 		_eObject = eObject;
 	}
 
@@ -52,9 +57,9 @@ public class Node
 		return getFullNameTyped() + "-M" + getModelId();
 	}
 
-	public Integer getModelId()
+	public String getModelId()
 	{
-		return _flatModel.getId();
+		return _modelId;
 	}
 
 	public String getFullName()
@@ -69,13 +74,13 @@ public class Node
 
 	public boolean isInSameModel(Node otherNode)
 	{
-		return _flatModel == otherNode._flatModel;
+		return _modelId == otherNode.getModelId();
 	}
 
 	public String getParentName()
 	{
 		EObject eContainer = _eObject.eContainer();
-		return (eContainer instanceof EPackage) ? null : ((ENamedElementImpl)eContainer).getName();
+		return (eContainer instanceof EPackage || eContainer == null) ? null : ((ENamedElementImpl)eContainer).getName();
 	}
 
 	public List<String> getChildrenNames()

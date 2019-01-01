@@ -20,18 +20,13 @@ public class WeightOptimizedMatches extends AbstractMatches
 			double weight = NwmWeight.nonNormalizedWeightForTuple(new HashSet<>(Arrays.asList(nodePair.getValue0(), nodePair.getValue1())));
 			weightForPair.put(nodePair, weight);
 		});
-		return getSimilarities().getAllIndexes().stream()
-				.sorted((a, b) -> Double.compare(weightForPair.get(b), weightForPair.get(a))).collect(Collectors.toList());
+		return getSimilarities().getAllIndexes().stream().sorted(Comparator.comparing(p -> -weightForPair.get(p))).collect(Collectors.toList());
 	}
 
 	@Override
 	Pair<Node, Node> chooseNextPair(List<Pair<Node, Node>> pairs)
 	{
 		Pair<Node, Node> bestPair = pairs.get(0);
-		if (!willImproveWeight(bestPair)) {
-			return bestPair;
-		}
-		bestPair = pairs.stream().limit(4).max(Comparator.comparing(this::computeWeightImprovementFor)).get();
 		return bestPair;
 	}
 
@@ -57,9 +52,9 @@ public class WeightOptimizedMatches extends AbstractMatches
 		Set<Node> mergedGroup = new HashSet<Node>(nodeAGroup);
 		mergedGroup.addAll(nodeBGroup);
 
-		double weightAGroup = NwmWeight.nonNormalizedWeightForTuple(nodeAGroup);
-		double weightBGroup = NwmWeight.nonNormalizedWeightForTuple(nodeBGroup);
-		double weightMergedGroup = NwmWeight.nonNormalizedWeightForTuple(mergedGroup);
+		double weightAGroup = NwmWeight.nonNormalizedWeightForTuple(nodeAGroup, true);
+		double weightBGroup = NwmWeight.nonNormalizedWeightForTuple(nodeBGroup, true);
+		double weightMergedGroup = NwmWeight.nonNormalizedWeightForTuple(mergedGroup, true);
 
 		double weightImprovement = weightMergedGroup - (weightAGroup + weightBGroup);
 		return weightImprovement;

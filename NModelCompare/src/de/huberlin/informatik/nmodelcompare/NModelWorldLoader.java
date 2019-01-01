@@ -14,16 +14,28 @@ public class NModelWorldLoader
 	}
 
 	private Option _option;
+	private int _chunkSize;
+
+	public NModelWorldLoader(Option option, int chunkSize)
+	{
+		_option = option;
+		_chunkSize = chunkSize;
+	}
 
 	public NModelWorldLoader(Option option)
 	{
-		_option = option;
+		this(option, Integer.MAX_VALUE);
+	}
+
+	public static List<NModelWorld> loadChunks(Option option, String filename, int chunkSize) throws IOException
+	{
+		return new NModelWorldLoader(option, chunkSize).loadCsv(filename);
 	}
 
 	public static NModelWorld load(Option option, String... filenames) throws IOException
 	{
 		if (filenames.length == 1) {
-			return new NModelWorldLoader(option).loadCsv(filenames[0]);
+			return new NModelWorldLoader(option).loadCsv(filenames[0]).get(0);
 		}
 		return new NModelWorldLoader(option).loadEcoreModels(filenames);
 	}
@@ -48,9 +60,14 @@ public class NModelWorldLoader
 		return fillNModelWorld(Arrays.stream(filenames).map(path -> ModelLoader.loadEcore(path)).collect(Collectors.toList()));
 	}
 
-	private NModelWorld loadCsv(String filename) throws IOException
+	private List<NModelWorld> loadCsv(String filename) throws IOException
 	{
-		return fillNModelWorld(ModelLoader.loadCsv(filename));
+		List<EPackage> ecoreModels = ModelLoader.loadCsv(filename);
+		List<NModelWorld> nModelWorlds = new ArrayList<>();
+		for (int i = 0; i < ecoreModels.size(); i += _chunkSize) {
+			nModelWorlds.add(fillNModelWorld(ecoreModels.subList(i, Math.min(i + _chunkSize, ecoreModels.size()))));
+		}
+		return nModelWorlds;
 	}
 
 	private NModelWorld fillNModelWorld(List<EPackage> ecoreModels)

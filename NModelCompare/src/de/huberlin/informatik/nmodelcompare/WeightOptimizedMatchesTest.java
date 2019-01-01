@@ -14,27 +14,27 @@ class WeightOptimizedMatchesTest
 	@Test
 	void nwmWeightIsBetterThanWithGreedyMatches() throws IOException
 	{
-		NModelWorld world = NModelWorldLoader.load(Option.CLASSES_ONLY, "testdata/random_subset.csv");
+		NModelWorld world = NModelWorldLoader.loadChunks(Option.CLASSES_ONLY, "testdata/random.csv", 10).get(0);
 		Similarities similarities = world.findSimilarities(2.5);
 		Set<Set<Node>> greedyMatches = new GreedyDistanceMatches(similarities).getMatchesSet();
 		Set<Set<Node>> weightOptimizedMatches = new WeightOptimizedMatches(similarities).getMatchesSet();
-		NwmWeight greedyMatchesWeight = new NwmWeight(greedyMatches, 100);
-		NwmWeight weightOptimizedMatchesWeight = new NwmWeight(weightOptimizedMatches, 100);
+		NwmWeight greedyMatchesWeight = new NwmWeight(greedyMatches, 10, true);
+		NwmWeight weightOptimizedMatchesWeight = new NwmWeight(weightOptimizedMatches, 10, true);
 
-		assertEquals(0.0008d, greedyMatchesWeight.sum(), 0.0001d);
+		assertEquals(0.3d, greedyMatchesWeight.sum(), 0.01d); // TODO: unstable
 		assertTrue(weightOptimizedMatchesWeight.sum() > greedyMatchesWeight.sum());
-		assertEquals(0.0042d, weightOptimizedMatchesWeight.sum(), 0.0001d);
+		assertEquals(0.53d, weightOptimizedMatchesWeight.sum(), 0.01d); // TODO: unstable
 	}
 
 	@Test
 	void nwmWeight() throws IOException
 	{
-		NModelWorld world = NModelWorldLoader.load(Option.CLASSES_ONLY, "testdata/random_sample270.csv");
+		NModelWorld world = NModelWorldLoader.loadChunks(Option.CLASSES_ONLY, "testdata/random.csv", 10).get(0);
 
-		Similarities similarities = world.findSimilarities(3.7);
+		Similarities similarities = world.findSimilarities(3.4);
 		Set<Set<Node>> weightOptimizedMatches = new WeightOptimizedMatches(similarities).getMatchesSet();
-		NwmWeight weightOptimizedMatchesWeight = new NwmWeight(weightOptimizedMatches, 100);
+		NwmWeight weightOptimizedMatchesWeight = new NwmWeight(weightOptimizedMatches, 10, true);
 
-		assertEquals(0.0092d, weightOptimizedMatchesWeight.sum(), 0.0003d); // TODO: unstable
+		assertEquals(1.03d, weightOptimizedMatchesWeight.sum(), 0.02d); // TODO: unstable
 	}
 }
