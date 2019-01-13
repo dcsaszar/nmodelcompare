@@ -63,9 +63,7 @@ public class MeasureNwmWeight
 
 	private static void warmUp() throws IOException
 	{
-		for (String testCase : TEST_CASES) {
-			NModelWorldLoader.loadChunks(option, "testdata/" + testCase + ".csv", 10);
-		}
+		NModelWorldLoader.loadChunks(option, "testdata/small.csv", 10);
 	}
 
 	private static String toRubinCpuSeconds(double timeElapsedMillis)
