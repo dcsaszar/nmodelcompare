@@ -16,8 +16,10 @@ public class Measurement
 	@Override
 	public String toString()
 	{
-		return String.format(Locale.ENGLISH, "#%d\t%.3f\t%s\t%2d\t%2d\t%.4f\t%.5f\t%.5f\t%.5f", runId, radius, testCase, chunkNumber, chunksCount,
-				resultNwmWeight, resultSearchTimeElapsedRubinSec + resultMatchTimeElapsedRubinSec, resultSearchTimeElapsedRubinSec,
+		return String.format(Locale.ENGLISH, "#%d\t%.3f\t%s\t%2d\t%2d\t%.4f\t%.5f\t%.5f\t%.5f\t%.5f", runId, radius, testCase, chunkNumber, chunksCount,
+				resultNwmWeight, resultIndexTimeElapsedRubinSec + resultSearchTimeElapsedRubinSec + resultMatchTimeElapsedRubinSec,
+				resultIndexTimeElapsedRubinSec,
+				resultSearchTimeElapsedRubinSec,
 				resultMatchTimeElapsedRubinSec);
 	}
 
@@ -26,6 +28,9 @@ public class Measurement
 		Measurement last = measurementsForAvg.get(measurementsForAvg.size() - 1);
 		Measurement avgMeasurement = new Measurement(last.runId, last.testCase, last.radius, last.chunksCount, last.chunkNumber);
 		avgMeasurement.resultNwmWeight = measurementsForAvg.stream().mapToDouble(r -> r.resultNwmWeight).average().getAsDouble();
+
+		avgMeasurement.resultIndexTimeElapsedRubinSec = measurementsForAvg.stream().mapToDouble(r -> r.resultIndexTimeElapsedRubinSec).average()
+				.getAsDouble();
 		avgMeasurement.resultSearchTimeElapsedRubinSec = measurementsForAvg.stream().mapToDouble(r -> r.resultSearchTimeElapsedRubinSec).average().getAsDouble();
 		avgMeasurement.resultMatchTimeElapsedRubinSec = measurementsForAvg.stream().mapToDouble(r -> r.resultMatchTimeElapsedRubinSec).average().getAsDouble();
 		return avgMeasurement;
@@ -47,6 +52,7 @@ public class Measurement
 
 		measurement.resultNwmWeight = s.nextDouble();
 		s.nextDouble(); // overall time
+		measurement.resultIndexTimeElapsedRubinSec = s.nextDouble();
 		measurement.resultSearchTimeElapsedRubinSec = s.nextDouble();
 		measurement.resultMatchTimeElapsedRubinSec = s.nextDouble();
 		s.close();
@@ -60,6 +66,7 @@ public class Measurement
 	public int chunksCount;
 	public int chunkNumber;
 	public double resultNwmWeight;
+	public double resultIndexTimeElapsedRubinSec;
 	public double resultSearchTimeElapsedRubinSec;
 	public double resultMatchTimeElapsedRubinSec;
 }

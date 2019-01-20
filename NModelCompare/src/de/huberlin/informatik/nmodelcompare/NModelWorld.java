@@ -4,15 +4,20 @@ import java.util.List;
 
 public class NModelWorld
 {
-	private final NodeIndex _nodeIndex;
+	private NodeIndex _nodeIndex;
 	private final List<Node> _nodes;
 	private final int _numberOfInputModels;
 
 	public NModelWorld(List<Node> nodes, int numberOfInputModels)
 	{
 		_nodes = nodes;
-		_nodeIndex = new NodeIndex(nodes);
+		_nodeIndex = null;
 		_numberOfInputModels = numberOfInputModels;
+	}
+
+	public void buildIndex()
+	{
+		_nodeIndex = new NodeIndex(_nodes);
 	}
 
 	public int getNumberOfInputModels()
@@ -40,6 +45,10 @@ public class NModelWorld
 
 	private Similarities findSimilarities(double maxDistance, boolean includeForSameModel)
 	{
+		if (_nodeIndex == null) {
+			buildIndex();
+		}
+
 		Similarities similarities = new Similarities(getNodes());
 		for (Node node : getNodes()) {
 			List<QueryResult> similar = _nodeIndex.findNearby(node, maxDistance);

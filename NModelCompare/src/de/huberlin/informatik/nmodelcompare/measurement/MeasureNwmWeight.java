@@ -54,13 +54,17 @@ public class MeasureNwmWeight
 				NModelWorld world = worlds.get(chunkNumber - 1);
 
 				Instant startedAt = Instant.now();
+				world.buildIndex();
+				Instant indexBuiltAt = Instant.now();
 				Similarities allSimilarities = world.findSimilarities(measurement.radius);
 				Instant foundSimilaritiesAt = Instant.now();
 				AbstractMatches matches = new WeightOptimizedMatches(allSimilarities);
 				Instant finishedAt = Instant.now();
 
 				measurement.resultNwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum();
-				measurement.resultSearchTimeElapsedRubinSec = toRubinCpuSeconds(Duration.between(startedAt, foundSimilaritiesAt));
+
+				measurement.resultIndexTimeElapsedRubinSec = toRubinCpuSeconds(Duration.between(startedAt, indexBuiltAt));
+				measurement.resultSearchTimeElapsedRubinSec = toRubinCpuSeconds(Duration.between(indexBuiltAt, foundSimilaritiesAt));
 				measurement.resultMatchTimeElapsedRubinSec = toRubinCpuSeconds(Duration.between(foundSimilaritiesAt, finishedAt));
 
 				if (remainingLoopCount == 0) {
@@ -74,7 +78,8 @@ public class MeasureNwmWeight
 						System.out.printf(Locale.ENGLISH,
 								"Weight: %.4f Time %.4f s¹ | ¹ Times are normalized to an Intel(R) Core(TM)2 Quad CPU Q8200 @ 2.33GHz\n\n",
 								avgMeasurement.resultNwmWeight,
-								avgMeasurement.resultSearchTimeElapsedRubinSec + avgMeasurement.resultMatchTimeElapsedRubinSec);
+								avgMeasurement.resultIndexTimeElapsedRubinSec + avgMeasurement.resultSearchTimeElapsedRubinSec
+										+ avgMeasurement.resultMatchTimeElapsedRubinSec);
 					}
 				}
 			}
