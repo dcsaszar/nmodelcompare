@@ -89,12 +89,20 @@ public class MeasureNwmWeight
 	private static void warmUp() throws IOException
 	{
 		Instant startedAt = Instant.now();
-		NModelWorld world = NModelWorldLoader.loadChunks(option, "testdata/warmUp.csv", 1).get(0);
-		AbstractMatches matches = new WeightOptimizedMatches(world.findSimilarities(99));
-		double weight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum();
+		OptionalDouble weight = IntStream.range(0, 5).mapToDouble(i -> {
+			NModelWorld world;
+			try {
+				world = NModelWorldLoader.loadChunks(option, "testdata/random_sample270.csv", 5).get(i);
+			}
+			catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			AbstractMatches matches = new WeightOptimizedMatches(world.findSimilarities(i * 1.5d));
+			return (new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum());
+		}).average();
 		Instant finishedAt = Instant.now();
 		long time = Duration.between(startedAt, finishedAt).toMillis();
-		System.out.println("Warm up: " + time + " ms, " + (weight == 0 ? "" : "."));
+		System.out.println("Warm up: " + time + " ms, " + (weight.getAsDouble() == 0d ? "" : "."));
 	}
 
 	private static void setupTestCases()
