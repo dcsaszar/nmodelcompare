@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import de.huberlin.informatik.nmodelcompare.*;
 import de.huberlin.informatik.nmodelcompare.NModelWorldLoader.Option;
@@ -13,60 +15,98 @@ public class MeasureNwmWeight
 	final static List<String> TEST_CASES = Arrays.asList("hospitals", "warehouses", "random", "randomLoose", "randomTight");
 	final static List<Double> RADII = Arrays.asList(0.0, 2.5, 2.75, 3.0, 3.125, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0, 5.5, 6.5, 7.5);
 	final static Option option = Option.CLASSES_ONLY;
+	final static List<Measurement> measurements = new ArrayList<>();
 
 	public static void main(String... args) throws IOException
 	{
 		warmUp();
+		setupTestCases();
 
-		for (double radius : RADII) {
-			for (String testCase : TEST_CASES) {
-				int chunkSize = testCase.startsWith("random") ? 10 : Integer.MAX_VALUE;
+		boolean isMicroBenchmarkRun = args.length == 2;
+		int warmupLoopCount = isMicroBenchmarkRun ? Integer.parseInt(args[1]) : 0;
 
-				Instant startedLoadingAt = Instant.now();
-				List<NModelWorld> worlds = NModelWorldLoader.loadChunks(option, "testdata/" + testCase + ".csv", chunkSize);
-				Instant loadedAt = Instant.now();
+		IntStream runIds;
 
-				long loadTimeElapsedMillis = Duration.between(startedLoadingAt, loadedAt).toMillis();
-				int modelCount = worlds.parallelStream().mapToInt(NModelWorld::getNumberOfInputModels).sum();
-				System.out.print("Using " + testCase + "; r=" + radius + "; " + option + " " + modelCount + "/" + worlds.size() + "");
-				long searchTimeElapsedMillis = 0;
-				long matchTimeElapsedMillis = 0;
-				double nwmWeight = 0;
-				for (NModelWorld world : worlds) {
-					if (worlds.size() > 1) {
-						System.out.print(".");
-					}
-					modelCount += world.getNumberOfInputModels();
-					Instant startedAt = Instant.now();
-					Similarities allSimilarities = world.findSimilarities(radius);
-					Instant foundSimilaritiesAt = Instant.now();
-					AbstractMatches matches = new WeightOptimizedMatches(allSimilarities);
-					Instant finishedAt = Instant.now();
+		if (isMicroBenchmarkRun) {
+			Integer requestedRunId = Integer.parseInt(args[0]);
+			runIds = IntStream.rangeClosed(requestedRunId, requestedRunId);
+		}
+		else {
+			runIds = IntStream.range(0, measurements.size());
+		}
 
-					searchTimeElapsedMillis += Duration.between(startedAt, foundSimilaritiesAt).toMillis();
-					matchTimeElapsedMillis += Duration.between(foundSimilaritiesAt, finishedAt).toMillis();
-					double weight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum();
-					// System.out.printf((Locale)null, " (%.3f) ", weight);
-					nwmWeight += weight;
+		runIds.forEachOrdered(runId -> {
+			for (int remainingLoopCount = warmupLoopCount; remainingLoopCount >= 0; remainingLoopCount--) {
+				Measurement measurement = measurements.get(runId);
+				int chunksCount = measurement.chunksCount;
+				int chunkSize = chunksCount == 1 ? Integer.MAX_VALUE : 10;
+				int chunkNumber = measurement.chunkNumber;
+
+				List<NModelWorld> worlds;
+
+				try {
+					worlds = NModelWorldLoader.loadChunks(option, "testdata/" + measurement.testCase + ".csv", chunkSize);
 				}
-				double avgFactor = 1.0d / worlds.size();
-				System.out.printf((Locale)null, "\n Weight:  %.4f\n", avgFactor * nwmWeight);
-				Object times = String.format("(load: %s find: %s match: %s)", toRubinCpuSeconds(avgFactor * loadTimeElapsedMillis),
-						toRubinCpuSeconds(avgFactor * searchTimeElapsedMillis), toRubinCpuSeconds(avgFactor * matchTimeElapsedMillis));
-				System.out.println(" Time:    "
-						+ toRubinCpuSeconds(avgFactor * (loadTimeElapsedMillis + searchTimeElapsedMillis + matchTimeElapsedMillis)) + " " + times);
+				catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+
+				NModelWorld world = worlds.get(chunkNumber - 1);
+
+				Instant startedAt = Instant.now();
+				Similarities allSimilarities = world.findSimilarities(measurement.radius);
+				Instant foundSimilaritiesAt = Instant.now();
+				AbstractMatches matches = new WeightOptimizedMatches(allSimilarities);
+				Instant finishedAt = Instant.now();
+
+				measurement.resultNwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum();
+				measurement.resultSearchTimeElapsedRubinSec = toRubinCpuSeconds(Duration.between(startedAt, foundSimilaritiesAt));
+				measurement.resultMatchTimeElapsedRubinSec = toRubinCpuSeconds(Duration.between(foundSimilaritiesAt, finishedAt));
+
+				if (remainingLoopCount == 0) {
+					System.out.println(measurement.toString());
+
+					if (isMicroBenchmarkRun || measurement.chunkNumber == measurement.chunksCount) {
+						IntStream avgRunIds = IntStream
+								.rangeClosed(isMicroBenchmarkRun ? measurement.runId : measurement.runId - measurement.chunksCount + 1, measurement.runId);
+						List<Measurement> measurementsForAvg = avgRunIds.mapToObj(id -> measurements.get(id)).collect(Collectors.toList());
+						Measurement avgMeasurement = Measurement.average(measurementsForAvg);
+						System.out.printf(Locale.ENGLISH,
+								"Weight: %.4f Time %.4f s¹ | ¹ Times are normalized to an Intel(R) Core(TM)2 Quad CPU Q8200 @ 2.33GHz\n\n",
+								avgMeasurement.resultNwmWeight,
+								avgMeasurement.resultSearchTimeElapsedRubinSec + avgMeasurement.resultMatchTimeElapsedRubinSec);
+					}
 				}
 			}
-
-		System.out.println("¹ Times are normalized to an Intel(R) Core(TM)2 Quad CPU Q8200 @ 2.33GHz");
+		});
 	}
 
 	private static void warmUp() throws IOException
 	{
-		NModelWorldLoader.loadChunks(option, "testdata/small.csv", 10);
+		Instant startedAt = Instant.now();
+		NModelWorld world = NModelWorldLoader.loadChunks(option, "testdata/warmUp.csv", 1).get(0);
+		AbstractMatches matches = new WeightOptimizedMatches(world.findSimilarities(99));
+		double weight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum();
+		Instant finishedAt = Instant.now();
+		long time = Duration.between(startedAt, finishedAt).toMillis();
+		System.out.println("Warm up: " + time + " ms, " + (weight == 0 ? "" : "."));
 	}
 
-	private static String toRubinCpuSeconds(double timeElapsedMillis)
+	private static void setupTestCases()
+	{
+		int runId = 0;
+		for (double radius : RADII) {
+			for (String testCase : TEST_CASES) {
+				boolean useAverage = testCase.startsWith("random");
+				int chunksCount = useAverage ? 10 : 1;
+				for (int chunkNumber = 1; chunkNumber <= chunksCount; chunkNumber++) {
+					measurements.add(new Measurement(runId++, testCase, radius, chunksCount, chunkNumber));
+				}
+			}
+		}
+	}
+
+	private static double toRubinCpuSeconds(Duration duration)
 	{
 		/* Gr3 Warehouse Rubin / local run */
 		double TIME_FACTOR = 45.4d / 16.392d; // 2.7696437286481213
@@ -79,6 +119,6 @@ public class MeasureNwmWeight
 		 * https://www.cpubenchmark.net/cpu.php?id=1040
 		 */
 		// double TIME_FACTOR = 5648d / 2812d; // 2.008534850640114
-		return Math.round(TIME_FACTOR * timeElapsedMillis) / 1000d + " s¹";
+		return TIME_FACTOR * duration.toMillis() / 1000d;
 	}
 }
