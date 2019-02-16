@@ -74,7 +74,11 @@ function typeNameFromProp(prop) {
     return prop.type.name;
   }
   if (prop.defaultValue) {
-    return typeof JSON.parse(prop.defaultValue.value);
+    try {
+      return typeof JSON.parse(prop.defaultValue.value);
+    } catch {
+      console.log("Unknown prop value", prop.defaultValue.value);
+    }
   }
   return "unknown";
 }
