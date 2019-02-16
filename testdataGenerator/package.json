@@ -5,7 +5,7 @@
     "lodash.compact": "^3.0.1",
     "lodash.uniq": "^4.5.0",
     "node-source-walk": "^4.0.0",
-    "nodegit": "^0.22.2",
+    "nodegit": "^0.24.1",
     "react-docgen": "^2.21.0",
     "sorted-json": "^0.2.3",
     "xmlbuilder": "^10.0.0"

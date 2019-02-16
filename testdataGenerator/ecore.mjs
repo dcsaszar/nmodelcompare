@@ -29,7 +29,9 @@ export async function ecoreModelFrom(path) {
       eClassifiersFromComponentInfo(componentInfo, { componentNames })
     );
   }
-  return xmlBuilder.create(sortedJSON.sortify(model)).end({ pretty: true });
+  return xmlBuilder
+    .create(sortedJSON.sortify(model, { sortBy: undefined }))
+    .end({ pretty: true });
 }
 
 function eClassifiersFromComponentInfo(ci, options) {
