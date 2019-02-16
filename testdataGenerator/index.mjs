@@ -49,12 +49,12 @@ async function extractModels() {
         `${modelsPath}/${description}.ecore`,
         xml.replace("${modelName}", description)
       );
-      allCsv.push(csv.replace(/\$\{modelName\}/g, allCsv.length + 1));
+      allCsv.push(csv.replace(/\$\{modelName\}/g, description));
     }
   }
   fs.writeFileSync(
     `${modelsPath}/${github.replace("/", "_")}.csv`,
-    allCsv.join("\n")
+    allCsv.join("")
   );
   console.log("Done.");
 }

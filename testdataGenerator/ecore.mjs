@@ -13,7 +13,7 @@ export async function modelFrom(path) {
   const model = await objectModelFrom(path);
   const xml = xmlBuilder.create(model).end({ pretty: true });
 
-  const classes = (model["ecore:EPackage"].eClassifiers || []).map(
+  const nonEmptyClasses = (model["ecore:EPackage"].eClassifiers || []).map(
     classifier => {
       const name = classifier["@name"];
       const attributes = uniq(
@@ -22,10 +22,13 @@ export async function modelFrom(path) {
           ...(classifier.eStructuralFeatures || [])
         ].map(op => op["@name"])
       );
-      return `\${modelName},${name},${attributes.join(";")}`;
+      if (attributes.length === 0) {
+        return "";
+      }
+      return `\${modelName},${name},${attributes.join(";")}\n`;
     }
   );
-  const csv = classes.join("\n");
+  const csv = nonEmptyClasses.join("");
   return { csv, xml };
 }
 
