@@ -43,4 +43,5 @@ async function extractModels() {
       );
     }
   }
+  console.log("Done.");
 }
