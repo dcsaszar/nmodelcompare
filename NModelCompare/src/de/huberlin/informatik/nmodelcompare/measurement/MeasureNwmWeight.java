@@ -13,7 +13,8 @@ import de.huberlin.informatik.nmodelcompare.NModelWorldLoader.Option;
 public class MeasureNwmWeight
 {
 	final static List<String> TEST_CASES = Arrays.asList("hospitals", "warehouses", "random", "randomLoose", "randomTight");
-	final static List<Double> RADII = Arrays.asList(0.0, 2.5, 2.75, 3.0, 3.125, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0, 5.5, 6.5, 7.5);
+	final static List<Double> RADII = IntStream.rangeClosed(0, 6 * 8).mapToObj(i -> new Double(0.125d * i)).collect(Collectors.toList());
+	
 	final static Option option = Option.CLASSES_ONLY;
 	final static List<Measurement> measurements = new ArrayList<>();
 
