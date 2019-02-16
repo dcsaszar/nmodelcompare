@@ -9,7 +9,27 @@ import Walker from "node-source-walk";
 import { filenamesFromGit } from "./git";
 import sortedJSON from "sorted-json";
 
-export async function ecoreModelFrom(path) {
+export async function modelFrom(path) {
+  const model = await objectModelFrom(path);
+  const xml = xmlBuilder.create(model).end({ pretty: true });
+
+  const classes = (model["ecore:EPackage"].eClassifiers || []).map(
+    classifier => {
+      const name = classifier["@name"];
+      const attributes = uniq(
+        [
+          ...(classifier.eOperations || []),
+          ...(classifier.eStructuralFeatures || [])
+        ].map(op => op["@name"])
+      );
+      return `\${modelName},${name},${attributes.join(";")}`;
+    }
+  );
+  const csv = classes.join("\n");
+  return { csv, xml };
+}
+
+async function objectModelFrom(path) {
   const componentInfos = await extractComponentInfos(path);
   const model = {
     "ecore:EPackage": {
@@ -29,9 +49,7 @@ export async function ecoreModelFrom(path) {
       eClassifiersFromComponentInfo(componentInfo, { componentNames })
     );
   }
-  return xmlBuilder
-    .create(sortedJSON.sortify(model, { sortBy: undefined }))
-    .end({ pretty: true });
+  return sortedJSON.sortify(model, { sortBy: undefined });
 }
 
 function eClassifiersFromComponentInfo(ci, options) {
