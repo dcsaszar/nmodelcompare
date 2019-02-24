@@ -27,15 +27,7 @@ public abstract class AbstractMatches
 			remainingPairs.remove(nodePair);
 		}
 
-		Set<Pair<Node, Node>> keptPairs = getPairsByPriority().stream()
-				.filter(pair -> isIdWithoutMatch(pair) || (isDisjoint(pair) && isFittingMatch(pair)))
-				.collect(Collectors.toSet());
-		Set<Node> keptNodes = keptPairs.stream().flatMap(p -> Arrays.asList(new Node[] { p.getValue0(), p.getValue1() }).stream())
-				.collect(Collectors.toSet());
-
-		Similarities keptSimilarities = new Similarities(keptNodes.stream().collect(Collectors.toList()));
-		keptPairs.stream().forEach(pair -> keptSimilarities.addDistance(pair, _similarities.getDistance(pair)));
-		_remainingSimilarities = keptSimilarities;
+		_remainingSimilarities = null;
 
 		Set<Set<Node>> uniqueMatches = _matchesByNode.values().stream().collect(Collectors.toSet());
 		_matchesSet = uniqueMatches;
@@ -121,8 +113,19 @@ public abstract class AbstractMatches
 	{
 		return _matchesList.getAll();
 	}
-	
-	public Similarities getRemaining() {
+
+	public Similarities getRemaining()
+	{
+		if (_remainingSimilarities == null) {
+			Set<Pair<Node, Node>> keptPairs = getPairsByPriority().stream()
+					.filter(pair -> isIdWithoutMatch(pair) || (isDisjoint(pair) && isFittingMatch(pair))).collect(Collectors.toSet());
+			Set<Node> keptNodes = keptPairs.stream().flatMap(p -> Arrays.asList(new Node[] { p.getValue0(), p.getValue1() }).stream())
+					.collect(Collectors.toSet());
+
+			Similarities keptSimilarities = new Similarities(keptNodes.stream().collect(Collectors.toList()));
+			keptPairs.stream().forEach(pair -> keptSimilarities.addDistance(pair, _similarities.getDistance(pair)));
+			_remainingSimilarities = keptSimilarities;
+		}
 		return _remainingSimilarities;
 	}
 
