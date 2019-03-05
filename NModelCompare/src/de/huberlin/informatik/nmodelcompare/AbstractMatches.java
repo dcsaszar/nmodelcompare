@@ -16,8 +16,15 @@ public abstract class AbstractMatches
 	public AbstractMatches(Similarities similarities)
 	{
 		_similarities = similarities;
+	}
+
+	public void compute()
+	{
+		if (_matchesByNode != null) {
+			return;
+		}
 		_matchesByNode = new HashMap<>();
-		similarities.getNodes().forEach(node -> _matchesByNode.put(node, new HashSet<Node>(Arrays.asList(node))));
+		_similarities.getNodes().forEach(node -> _matchesByNode.put(node, new HashSet<Node>(Arrays.asList(node))));
 		List<Pair<Node, Node>> remainingPairs = getPairsByPriority();
 		while (!remainingPairs.isEmpty()) {
 			Pair<Node, Node> nodePair = chooseNextPair(remainingPairs);
@@ -111,11 +118,13 @@ public abstract class AbstractMatches
 
 	public List<List<Node>> getMatches()
 	{
+		compute();
 		return _matchesList.getAll();
 	}
 
 	public Similarities getRemaining()
 	{
+		compute();
 		if (_remainingSimilarities == null) {
 			Set<Pair<Node, Node>> keptPairs = getPairsByPriority().stream()
 					.filter(pair -> isIdWithoutMatch(pair) || (isDisjoint(pair) && isFittingMatch(pair))).collect(Collectors.toSet());
@@ -131,11 +140,13 @@ public abstract class AbstractMatches
 
 	public MatchesList getMatchesList()
 	{
+		compute();
 		return _matchesList;
 	}
 
 	public Set<Set<Node>> getMatchesSet()
 	{
+		compute();
 		return _matchesSet;
 	}
 }

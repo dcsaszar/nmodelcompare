@@ -14,8 +14,9 @@ public class MeasureNwmWeight
 {
 	final static List<String> TEST_CASES = Arrays.asList("captbaritone_webamp", "jeffersonRibeiro_react-shopping-cart", "kabirbaidhya_react-todo-app",
 			"hospitals", "warehouses", "random", "randomLoose", "randomTight");
+	final static List<Integer> LOOKAHEAD = Arrays.asList(0, 10, 100);
 	final static List<Double> RADII = IntStream.rangeClosed(0, 6 * 8).mapToObj(i -> new Double(0.125d * i)).collect(Collectors.toList());
-	
+
 	final static Option option = Option.CLASSES_ONLY;
 	final static List<Measurement> measurements = new ArrayList<>();
 
@@ -43,6 +44,7 @@ public class MeasureNwmWeight
 				int chunksCount = measurement.chunksCount;
 				int chunkSize = chunksCount == 1 ? Integer.MAX_VALUE : 10;
 				int chunkNumber = measurement.chunkNumber;
+				int lookahead = measurement.lookahead;
 
 				List<NModelWorld> worlds;
 
@@ -60,7 +62,9 @@ public class MeasureNwmWeight
 				Instant indexBuiltAt = Instant.now();
 				Similarities allSimilarities = world.findSimilarities(measurement.radius);
 				Instant foundSimilaritiesAt = Instant.now();
-				AbstractMatches matches = new WeightOptimizedMatches(allSimilarities);
+				AbstractMatches matches = lookahead == 0 ? new WeightOptimizedMatches(allSimilarities)
+						: new WeightOptimizedLookaheadMatches(allSimilarities, lookahead);
+				matches.compute();
 				Instant finishedAt = Instant.now();
 
 				measurement.resultNwmWeight = new NwmWeight(matches.getMatchesSet(), world.getNumberOfInputModels(), true).sum();
@@ -79,8 +83,7 @@ public class MeasureNwmWeight
 						Measurement avgMeasurement = Measurement.average(measurementsForAvg);
 						System.out.printf(Locale.ENGLISH,
 								"Weight: %.4f Time %.4f s¹ | ¹ Times are normalized to an Intel(R) Core(TM)2 Quad CPU Q8200 @ 2.33GHz\n\n",
-								avgMeasurement.resultNwmWeight,
-								avgMeasurement.resultIndexTimeElapsedRubinSec + avgMeasurement.resultSearchTimeElapsedRubinSec
+								avgMeasurement.resultNwmWeight, avgMeasurement.resultIndexTimeElapsedRubinSec + avgMeasurement.resultSearchTimeElapsedRubinSec
 										+ avgMeasurement.resultMatchTimeElapsedRubinSec);
 					}
 				}
@@ -110,12 +113,14 @@ public class MeasureNwmWeight
 	private static void setupTestCases()
 	{
 		int runId = 0;
-		for (double radius : RADII) {
-			for (String testCase : TEST_CASES) {
-				boolean useAverage = testCase.startsWith("random");
-				int chunksCount = useAverage ? 10 : 1;
-				for (int chunkNumber = 1; chunkNumber <= chunksCount; chunkNumber++) {
-					measurements.add(new Measurement(runId++, testCase, radius, chunksCount, chunkNumber));
+		for (int lookahead : LOOKAHEAD) {
+			for (double radius : RADII) {
+				for (String testCase : TEST_CASES) {
+					boolean useAverage = testCase.startsWith("random");
+					int chunksCount = useAverage ? 10 : 1;
+					for (int chunkNumber = 1; chunkNumber <= chunksCount; chunkNumber++) {
+						measurements.add(new Measurement(runId++, testCase, radius, chunksCount, chunkNumber, lookahead));
+					}
 				}
 			}
 		}

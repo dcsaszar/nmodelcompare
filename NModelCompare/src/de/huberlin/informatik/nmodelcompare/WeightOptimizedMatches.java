@@ -40,13 +40,13 @@ public class WeightOptimizedMatches extends AbstractMatches
 		return willImproveWeight(nodePair);
 	}
 
-	private boolean willImproveWeight(Pair<Node, Node> nodePair)
+	protected boolean willImproveWeight(Pair<Node, Node> nodePair)
 	{
 		double weightImprovement = computeWeightImprovementFor(nodePair);
 		return weightImprovement > 0;
 	}
 
-	private double computeWeightImprovementFor(Pair<Node, Node> nodePair)
+	protected double computeWeightImprovementFor(Pair<Node, Node> nodePair)
 	{
 		Node nodeA = nodePair.getValue0();
 		Node nodeB = nodePair.getValue1();
