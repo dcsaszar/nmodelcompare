@@ -123,17 +123,7 @@ public class MeasureNwmWeight
 
 	private static double toRubinCpuSeconds(Duration duration)
 	{
-		/* Gr3 Warehouse Rubin / local run */
 		double TIME_FACTOR = 45.4d / 16.392d; // 2.7696437286481213
-		/* NwM Warehouse Rubin / local run */
-		// double TIME_FACTOR = 2.9d * 60 / 64.532d; // 2.696336701171512
-		/* NwM Hospital Rubin / local run */
-		// double TIME_FACTOR = 42.7d / 19.575d // 2.1813537675606645
-		/*
-		 * https://www.cpubenchmark.net/cpu.php?id=2713
-		 * https://www.cpubenchmark.net/cpu.php?id=1040
-		 */
-		// double TIME_FACTOR = 5648d / 2812d; // 2.008534850640114
 		return TIME_FACTOR * duration.toMillis() / 1000d;
 	}
 }
