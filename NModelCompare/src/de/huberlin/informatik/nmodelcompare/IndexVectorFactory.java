@@ -63,7 +63,7 @@ public class IndexVectorFactory
 
 		v.setCoord(_parentNameDimension.get(node.getParentName()), 1);
 		v.setCoord(_nameDimension.get(node.getName()), 1);
-		substrings(node.getName()).stream().forEach(s -> v.setCoord(_nameSubstringDimension.get(s), 1));
+		substrings(node.getName()).stream().forEach(s -> v.setCoord(getNameSubstringDimension().get(s), 1));
 		node.getChildrenNames().stream().forEach(n -> v.setCoord(_childrenNamesDimension.get(n), 1));
 
 		return v;
@@ -72,5 +72,31 @@ public class IndexVectorFactory
 	public int getDimensions()
 	{
 		return _dimensions;
+	}
+
+	public String getDescription()
+	{
+		return "" + _dimensions + "\t" + _parentNameDimension.size() + "\t" + _nameDimension.size() + "\t" + getNameSubstringDimension().size() + "\t"
+				+ _childrenNamesDimension.size();
+	}
+
+	public Map<String, Integer> getNameSubstringDimension()
+	{
+		return _nameSubstringDimension;
+	}
+
+	public Map<String, Integer> getChildrenNamesDimension()
+	{
+		return _childrenNamesDimension;
+	}
+
+	public Map<String, Integer> getNameDimension()
+	{
+		return _nameDimension;
+	}
+
+	public Map<String, Integer> getParentNameDimension()
+	{
+		return _parentNameDimension;
 	}
 }
